@@ -187,7 +187,7 @@ class termsort_gen =
 
     method private gen_deconstructor file hdr e c consig =
       let arity = List.length consig in
-      let macro = String.uppercase c ^ "_" in 
+      let macro = String.uppercase_ascii c ^ "_" in 
       let ret = no_qual (Ident ("struct " ^ c ^ "_decon")) in
       let f_name= c ^ "_decon" in
       let f_args = args [etype e] in
@@ -221,7 +221,7 @@ class termsort_gen =
 	args (List.map (function (x,_) -> no_qual (Ident x)) consig) in
       let body1 = [ Expr ("struct " ^ c ^ "_ *ret;");
 		    Expr ("stamp s[" ^ num_args ^ "];");
-		    Expr ("s[0] = " ^ (String.uppercase (c^"_;"))) ] in
+		    Expr ("s[0] = " ^ (String.uppercase_ascii (c^"_;"))) ] in
       let gen_s e n = 
 	Expr ("s[" ^ (int_to_string n) ^"] = "  
 	      ^ e ^ "_get_stamp((gen_e)arg" ^(int_to_string n) ^");") in
@@ -249,7 +249,7 @@ class termsort_gen =
       let p,f = gen_proto_and_fun ~quals:[] (ret,name,args,body) in
       let names = 
 	[("CONSTRUCTOR",c);("EXPRID",e);("TYPE",ctype)] in
-      file#add_macro (define_val (String.uppercase (c ^ "_")) 
+      file#add_macro (define_val (String.uppercase_ascii (c ^ "_")) 
 			ctype);
       hdr#add_gdecl (decl_substitution names query_decl);
       file#add_fdef (def_substitution names query_defn);
@@ -265,10 +265,10 @@ class termsort_gen =
       let b1 = [Return ("(gen_e)&" ^ c ^ "_")] in 
       let b2 = [Return ("((gen_term)arg1)->type == "  ^ c ^ "_.st")] in
       let bodies = [|b1;b2|] in
-      file#add_macro (define_val (String.uppercase c ^ "_")
+      file#add_macro (define_val (String.uppercase_ascii c ^ "_")
 			(this#get_new_type()) );
-      file#add_gdecl (var ~init:("{" ^ (String.uppercase c) ^ "_," 
-				 ^ (String.uppercase c) ^ "_}")
+      file#add_gdecl (var ~init:("{" ^ (String.uppercase_ascii c) ^ "_," 
+				 ^ (String.uppercase_ascii c) ^ "_}")
 			(no_qual (Struct "gen_term"))
 		      ( c ^ "_" ) (Some Static));
       for i = 0 to 1 do
@@ -287,11 +287,11 @@ class termsort_gen =
 	let gen_field (e',v) n = 
 	  let incl = match v with
 	  | NEGvariance -> 
-	      (raise (Variance ("Term constructors do not allow variance"));"")
+	      raise (Variance ("Term constructors do not allow variance"))
 	  | NOvariance -> 
 	      e' ^ "_unify_ind"
 	  | POSvariance -> 
-	      (raise (Variance ("Term constructors do not allow variance"));"")
+	      raise (Variance ("Term constructors do not allow variance"))
 	  in
 	  Expr (incl ^ "(((struct " ^ c ^ "_ *)arg1)->f" ^ n ^
 		",((struct " ^ c ^ "_ *)arg2)->f" ^ n ^ ");")
@@ -303,15 +303,15 @@ class termsort_gen =
 	      counter := !counter+1; gen_field b (int_to_string (!counter))) 
 	    consig 
 	in
-	(String.uppercase (c ^ "_"),(Compound con_cases))
+	(String.uppercase_ascii (c ^ "_"),(Compound con_cases))
       in
       let gen_inner_switch (((c,is_param, grp_opt),consig_opt),others) = match consig_opt with
       |	Some consig ->
-	  (String.uppercase c ^ "_",
+	  (String.uppercase_ascii c ^ "_",
 	   Switch ("((gen_term)arg2)->type",
 		   [(gen_con_case c consig)],
 		   Expr "handle_error(arg1,arg2,bek_cons_mismatch);") )
-      |	None -> (String.uppercase c ^ "_",
+      |	None -> (String.uppercase_ascii c ^ "_",
 		 Expr "if (((gen_term)arg1)->type != ((gen_term)arg2)->type) handle_error(arg1,arg2,bek_cons_mismatch);")
       in
       let body conids = 
@@ -365,7 +365,7 @@ class termsort_gen =
 	  | _ -> 
 	      Return "FALSE"
 	in
-	(String.uppercase c ^ "_",gen_con_body consig)
+	(String.uppercase_ascii c ^ "_",gen_con_body consig)
       in
       let switch_cases =  var_case :: (List.map gen_con_case b) in
       let switch = Switch ("((gen_term)ecr)->type",switch_cases, Return "FALSE") in
@@ -404,7 +404,7 @@ class termsort_gen =
 	in
 	match consig with
 	| Some ((e',v) :: t) -> 
-	    (String.uppercase c ^ "_",
+	    (String.uppercase_ascii c ^ "_",
 	     Compound ([ Expr ("fprintf(arg1,\"" ^ c ^ "(\");");
 			 Expr (e' ^
 			       "_print(arg1,((struct " ^ c ^ "_ *)ecr)->f0);");
@@ -413,9 +413,9 @@ class termsort_gen =
 		       [ Expr ("fprintf(arg1,\")\");") ]
 			 )) 
 	| Some nil -> 
-	    (String.uppercase c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
+	    (String.uppercase_ascii c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
 	| None ->
-	    (String.uppercase c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
+	    (String.uppercase_ascii c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
       in
       let base_cases = List.combine base_idents base_statements in
       let pr_con_cases = List.map gen_con_case b in
