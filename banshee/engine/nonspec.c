@@ -1704,7 +1704,7 @@ char *expr_constant_name(gen_e e)
   return setif_get_constant_name(e);
 }
 
-int expr_stamp(gen_e e)
+INT_PTR expr_stamp(gen_e e)
 {
   get_stamp_fn_ptr get_stamp = get_sort_stamp(e->sort);
   return get_stamp(e);
@@ -1787,8 +1787,7 @@ void cons_group_add(cons_group g, constructor c)
 
   assert(c->groups);
   cons_group_list_cons(g,c->groups);
-}
-*/
+} */
 
 
 static gen_e make_group_cons_expr(cons_group g, gen_e *exps, int arity) {
