@@ -59,6 +59,7 @@ State 434 contains 2 shift/reduce conflicts.  (Four ways to parse this.)  */
 #include <stdio.h>
 #include <errno.h>
 #include <setjmp.h>
+#include <string.h>
 
 #include "parser.h"
 #include "c-parse.h"
@@ -69,8 +70,7 @@ State 434 contains 2 shift/reduce conflicts.  (Four ways to parse this.)  */
 #include "stmt.h"
 
 int yyparse(void) deletes;
-
-void yyerror();
+void yyerror(char *);
 
 /* Like YYERROR but do call yyerror.  */
 #define YYERROR1 { yyerror ("syntax error"); YYERROR; }
