@@ -55,8 +55,8 @@ DEFINE_NONPTR_LIST(mr_dyck_node_list,mr_dyck_node);
 #define MINIMIZE_CONSTRAINTS
 
 #ifdef MINIMIZE_CONSTRAINTS
-DECLARE_LIST(relevant_constraint_list,int);
-DEFINE_NONPTR_LIST(relevant_constraint_list,int);
+DECLARE_LIST(relevant_constraint_list,INT_PTR);
+DEFINE_NONPTR_LIST(relevant_constraint_list,INT_PTR);
 static relevant_constraint_list relevant_constraints;
 #endif
 
@@ -126,7 +126,7 @@ static bool relevant_constraint(int num)
     return TRUE;
   {
     relevant_constraint_list_scanner scan;
-    int next;
+    INT_PTR next;
 
     relevant_constraint_list_scan(relevant_constraints,&scan);
 
@@ -165,8 +165,8 @@ static constructor get_constructor(int index, mr_edge_kind kind)
   sig_elt c_sig[1] = {{vnc_pos,setif_sort}};
 
   // Add this index to the list of seen indices
-  if (!hash_table_lookup(mr_seen_indices,(void *)index, NULL)) {
-    hash_table_insert(mr_seen_indices,(void *)index,(void *)index);
+  if (!hash_table_lookup(mr_seen_indices, (void *)(INT_PTR) index, NULL)) {
+    hash_table_insert(mr_seen_indices, (void *)(INT_PTR) index, (void *)(INT_PTR)index);
   }
 
   switch (kind) {
@@ -184,17 +184,16 @@ static constructor get_constructor(int index, mr_edge_kind kind)
     break;
   }
   assert(built_constructors);
-  assert(name);
 
   // Check the hash to see if the constructor has been built yet
   // If not, build the constructor
-  if (!hash_table_lookup(built_constructors,(void *)index,(hash_data *)&result)) {
+  if (!hash_table_lookup(built_constructors, (void *)(INT_PTR)index, (hash_data *)&result)) {
     result = make_constructor(name,setif_sort,c_sig,1);
     // Hash it so that it can be be retrieved later
-    hash_table_insert(built_constructors,(void *)index,result);
+    hash_table_insert(built_constructors,(void *)(INT_PTR)index, result);
   }
 
-  assert(hash_table_lookup(built_constructors,(void *)index,NULL));
+  assert(hash_table_lookup(built_constructors,(void *)(INT_PTR)index, NULL));
   assert(result);
   return result;
 }
@@ -342,7 +341,7 @@ void mr_dyck_init(bool pn,FILE *rconstraints)
     printf("Reading relevant constraints\n");
 
     while (fgets(buf,100,rconstraints)) {
-      int next_relevant = atoi(buf);
+      INT_PTR next_relevant = atoi(buf);
       assert(next_relevant);
       //	printf("%d\n",next_relevant);
       relevant_constraint_list_cons(next_relevant, relevant_constraints);
@@ -470,12 +469,10 @@ void make_mr_dyck_open_edge(mr_dyck_node n1, mr_dyck_node n2, int index)
  
   exps[0] = n2->node_variable;
   
-  mr_call_setif_inclusion(constructor_expr(get_constructor(index,mr_o),
-					   exps, 1), n1->node_variable);
+  mr_call_setif_inclusion(constructor_expr(get_constructor(index,mr_o), exps, 1), n1->node_variable);
 
   if (pn_reach) {
-    mr_call_setif_inclusion(constructor_expr(mr_n_constructor,exps, 1), 
-			    n1->node_variable);
+    mr_call_setif_inclusion(constructor_expr(mr_n_constructor,exps, 1), n1->node_variable);
   }
 }
 
@@ -486,12 +483,10 @@ void make_mr_dyck_close_edge(mr_dyck_node n1, mr_dyck_node n2, int index)
  
   exps[0] = n2->node_variable;
   
-  mr_call_setif_inclusion(constructor_expr(get_constructor(index,mr_c),
-					   exps, 1), n1->node_variable);
+  mr_call_setif_inclusion(constructor_expr(get_constructor(index, mr_c), exps, 1), n1->node_variable);
 
   if (pn_reach) {
-    mr_call_setif_inclusion(constructor_expr(mr_p_constructor,exps, 1), 
-			    n1->node_variable);
+    mr_call_setif_inclusion(constructor_expr(mr_p_constructor,exps, 1), n1->node_variable);
   }
 }
 
@@ -506,7 +501,7 @@ static void encode_productions(void)
   mr_dyck_node_list_scanner scan;
   mr_dyck_node next_node;
   hash_table_scanner index_scan;
-  int next_index;
+  INT_PTR next_index;
 
   assert(state == mr_dyck_inited);
 

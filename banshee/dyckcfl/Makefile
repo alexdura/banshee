@@ -45,32 +45,40 @@ banshee_exe = ../bin/banshee.exe
 
 DYCKCFL = dyckcfl
 
-TARGETS =  $(DYCKCFL).o mr_$(DYCKCFL).o $(DYCKCFL)_terms.h $(DYCKCFL)_spec.o $(DYCKCFL)_terms.o $(DYCKCFL)_terms.c
+TARGETS =  $(DYCKCFL).o mr_$(DYCKCFL).o $(DYCKCFL)_terms.h $(DYCKCFL)_spec.o $(DYCKCFL)_terms.c $(DYCKCFL)_terms.o 
 
 TAGFILES = $(wildcard *.c) $(wildcard *.h)
 
-CC = gcc
+#CC = gcc
 
 ifdef DEBUG
 CFLAGS = -I$(engine_dir) -I$(region_dir) -Ddeletes= -Dtraditional= \
-         -Dsameregion= -Dparentptr= -Wall -Werror -g -pg
+         -Dsameregion= -Dparentptr= -Wall -Werror -g -pg \
+	 -DREGION_PROFILE
+#
 else
 CFLAGS = -I$(engine_dir) -I$(region_dir) -Ddeletes= -Dtraditional= \
-         -Dsameregion= -Dparentptr= -Wall -Werror 
+         -Dsameregion= -Dparentptr= -Wall -Werror \
+	 -DREGION_PROFILE
+#
 endif
 
 .PHONY: clean 
 
 all: $(TARGETS) 
 
-mr_$(DYCKCFL).o: 
+mr_$(DYCKCFL).o: mr_$(DYCKCFL).c mr_$(DYCKCFL).h
 	$(CC) -c $(CFLAGS) -DNONSPEC mr_$(DYCKCFL).c
 
-$(DYCKCFL).o:
+$(DYCKCFL).o: $(DYCKCFL).c $(DYCKCFL).h
 	$(CC) -c $(CFLAGS) -DNONSPEC $(DYCKCFL).c
 
 $(DYCKCFL)_terms.h: $(DYCKCFL)_terms.bsp
 	$(banshee_exe) $(DYCKCFL)_terms.bsp
+
+$(DYCKCFL)_terms.c: $(DYCKCFL)_terms.bsp
+	$(banshee_exe) $(DYCKCFL)_terms.bsp
+
 
 TAGS: $(TAGFILES)
 	etags $(TAGFILES)
