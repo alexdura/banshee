@@ -64,11 +64,10 @@ class setsort_gen =
 	 extern bool flag_eliminate_cycles;\n" in
       let header_decl = 
 	"DECLARE_LIST($EXPRID_list,$EXPRID);\n\
-	 DECLARE_LIST($EXPRID_entry_list,$EXPRID_entry);\n\
 	 $EXPRID $EXPRID_zero(void);\n\
 	 $EXPRID $EXPRID_one(void);\n\
          $EXPRID $EXPRID_wild(void);\n\
-     int $EXPRID_get_stamp($EXPRID e);\n\
+     INT_PTR $EXPRID_get_stamp($EXPRID e);\n\
 	 $EXPRID $EXPRID_fresh(const char *name);\n\
 	 $EXPRID $EXPRID_union($EXPRID_list exprs);\n\
 	 $EXPRID $EXPRID_inter($EXPRID_list exprs);\n\
@@ -77,13 +76,11 @@ class setsort_gen =
          int $EXPRID_cmp(const $EXPRID e1,const $EXPRID e2);\n\
 	 bool $EXPRID_is_constant($EXPRID e,const char *name);\n\
          void $EXPRID_inclusion($EXPRID e1,$EXPRID e2);\n\
-    void $EXPRID_annotated_inclusion($EXPRID e1,$EXPRID e2, annotation a);\n\
 	 void $EXPRID_unify($EXPRID e1,$EXPRID e2);\n\
-	 $EXPRID_entry_list $EXPRID_tlb($EXPRID e);\n"
+	 $EXPRID_list $EXPRID_tlb($EXPRID e);\n"
       in
       let file_decl = 
         "DECLARE_OPAQUE_LIST($EXPRID_list,gen_e);\n\
-		DECLARE_OPAQUE_LIST($EXPRID_entry_list,soln_entry);\n\
 	 $EXPRID $EXPRID_zero(void);\n\
 	 $EXPRID $EXPRID_one(void);\n\
          $EXPRID $EXPRID_wild(void);\n\
@@ -93,13 +90,12 @@ class setsort_gen =
 	 $EXPRID $EXPRID_inter($EXPRID_list exprs);\n\
 	 $EXPRID $EXPRID_constant(const char *name);\n\
          bool $EXPRID_is_constant($EXPRID e,const char *name);\n\
-	 $EXPRID_entry_list $EXPRID_tlb($EXPRID e);\n\
+	 $EXPRID_list $EXPRID_tlb($EXPRID e);\n\
 	 void $EXPRID_inclusion_ind($EXPRID e1,$EXPRID e2);\n\
 	 void $EXPRID_unify_ind($EXPRID e1,$EXPRID e2);\n"
       in
       let file_defn = 
 	"DEFINE_LIST($EXPRID_list,gen_e);\n\
-	DEFINE_LIST($EXPRID_entry_list,soln_entry);\n\
          $EXPRID $EXPRID_zero(void)\n\
 	 {\n \
 	     return setif_zero();\n\
@@ -151,7 +147,7 @@ class setsort_gen =
 	       else return (! strcmp(name,setif_get_constant_name(e)));\n\
 	   else return FALSE;\n\
          }\n\n\
-	 $EXPRID_entry_list $EXPRID_tlb($EXPRID e) \n\
+	 $EXPRID_list $EXPRID_tlb($EXPRID e) \n\
 	 {\n \
 	    return setif_tlb(e);\n\
 	 }\n\n\
@@ -159,42 +155,19 @@ class setsort_gen =
 	 {\n \
 	    setif_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e1,e2);\n\
 	 }\n\n\
-	void $EXPRID_annotated_inclusion_ind($EXPRID e1, $EXPRID e2,annotation a) \n\
-	 {\n \
-	    setif_annotated_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e1,e2,a);\n\
-	 }\n\n\
 	 void $EXPRID_inclusion($EXPRID e1, $EXPRID e2) \n\
 	 {\n \
             banshee_clock_tick();\n\
             $EXPRID_inclusion_ind(e1,e2);\n\
 	 }\n\n\
-	 void $EXPRID_annotated_inclusion($EXPRID e1, $EXPRID e2, annotation a) \n\
-	 {\n \
-            banshee_clock_tick();\n\
-            $EXPRID_annotated_inclusion_ind(e1,e2,a);\n\
-	 }\n\n\
 	 void $EXPRID_inclusion_ind_contra($EXPRID e1, $EXPRID e2) \n\
 	 {\n \
 	    setif_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e2,e1);\n\
-	 }\n\n\
-	 void $EXPRID_annotated_inclusion_ind_contra($EXPRID e1, $EXPRID e2, annotation a) \n\
-	 {\n \
-	    setif_annotated_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e2,e1, a);\n\
 	 }\n\n\
 	 void $EXPRID_unify_ind($EXPRID e1, $EXPRID e2) \n\
 	 {\n \
 	    setif_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e1,e2);\n\
 	    setif_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e2,e1);\n\
-	 }\n\
-	 void $EXPRID_annotated_unify_ind($EXPRID e1, $EXPRID e2, annotation a) \n\
-	 {\n \
-	    setif_annotated_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e1,e2,a);\n\
-	    setif_annotated_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,e2,e1,a);\n\
-	 }\n\
-	void $EXPRID_annotated_unify($EXPRID e1, $EXPRID e2, annotation a) \n\
-	 {\n \
-            banshee_clock_tick();\n\
-            $EXPRID_annotated_unify_ind(e1,e2,a);\n\
 	 }\n\
 	 void $EXPRID_unify($EXPRID e1, $EXPRID e2) \n\
 	 {\n \
@@ -204,8 +177,6 @@ class setsort_gen =
       in
       let file_tdecls = 
 	"typedef gen_e $EXPRID;\n\
-	 typedef soln_entry $EXPRID_entry;\n\
-   	 typedef soln_entry_list $EXPRID_entry_list;\n
 	 typedef gen_e_list $EXPRID_list;\n"
       in
       let names = [("$EXPRID",e);("$REGION",region);("$HASH",hash)]
@@ -474,16 +445,16 @@ class setsort_gen =
  method private gen_con_match 
 	(file : file) (e : exprid) (sigs : databody) = 
       let name = e ^ "_con_match" in
-      let args = args [gen_e_type; gen_e_type; (no_qual (Ident "annotation"))] in
+      let args = args [gen_e_type; gen_e_type] in
 	  let incl (e', v) = match v with
-				| NEGvariance -> e' ^ "_annotated_inclusion_ind_contra"
-				| NOvariance -> e' ^ "_annotated_unify_ind"
-				| POSvariance -> e' ^ "_annotated_inclusion_ind" in
+				| NEGvariance -> e' ^ "_inclusion_ind_contra"
+				| NOvariance -> e' ^ "_unify_ind"
+				| POSvariance -> e' ^ "_inclusion_ind" in
 	  let gen_param_proj_case cn n (e',v) =
 		let cond = "(((struct " ^ cn ^ "_ *)arg1)->index == ((struct " ^ cn ^ "Proj" ^ n ^ "_ *)arg2)->index)"
 		in
 		let e1 = Expr (incl(e',v) ^ "(((struct " ^ cn ^ "_ *)arg1)->f" ^ n ^ "," ^
-	  "((struct " ^ cn ^ "Proj" ^ n ^ "_ *)arg2)->f0,arg3);")
+	  "((struct " ^ cn ^ "Proj" ^ n ^ "_ *)arg2)->f0);")
 		in		
 		let e2 = Return "";
 		in
@@ -496,7 +467,7 @@ class setsort_gen =
 		in
 		let ret =
 	  incl(e',v) ^ "(((struct " ^ c ^ "_ *)arg1)->f" ^ n ^ "," ^
-	  "((struct " ^ c' ^ "Proj" ^ n ^ "_ *)arg2)->f0,arg3);"
+	  "((struct " ^ c' ^ "Proj" ^ n ^ "_ *)arg2)->f0);"
 	in
 	(String.uppercase c' ^ "PROJ" ^ n ^ "_",Expr ret) 
       in
@@ -505,7 +476,7 @@ class setsort_gen =
 			in
 			let gen_field (e',v) n = 
 			  (incl (e',v)^ "(((struct " ^ cn ^ "_ *)arg1)->f" ^ n ^
-			   ",((struct " ^ cn ^ "_ *)arg2)->f" ^ n ^ ",arg3)")
+			   ",((struct " ^ cn ^ "_ *)arg2)->f" ^ n ^ ")")
 			in
 			let con_cases = 
 			  let counter = ref (-1) in
@@ -524,7 +495,7 @@ class setsort_gen =
       let gen_con_case c consig = 
 		let gen_field (e',v) n = 
 	  (incl (e',v)^ "(((struct " ^ c ^ "_ *)arg1)->f" ^ n ^
-	   ",((struct " ^ c ^ "_ *)arg2)->f" ^ n ^ ",arg3)")
+	   ",((struct " ^ c ^ "_ *)arg2)->f" ^ n ^ ")")
 	in
 	let con_cases = 
 	  let counter = ref (-1) in
@@ -539,7 +510,7 @@ class setsort_gen =
 	  let gen_group_con_case cn grp consig =
 			let gen_field (e',v) n = 
 		  (incl (e',v)^ "(((struct " ^ grp ^ "_ *)arg1)->f" ^ n ^
-		   ",((struct " ^ cn ^ "_ *)arg2)->f" ^ n ^ ",arg3)")
+		   ",((struct " ^ cn ^ "_ *)arg2)->f" ^ n ^ ")")
 		in
 		let con_cases = 
 		  let counter = ref (-1) in
@@ -681,8 +652,8 @@ class setsort_gen =
 		          else\n\
 		          {\n\
 			   $EXPRID e;\n\
-			   annotated_bound_entry lb; \n\
-			   annotated_bounds_scanner scan; \n\
+			   gen_e lb; \n\
+			   bounds_scanner scan; \n\
 			   c = $EPRIME_fresh(NULL);\n\
 			   e = $CONSTRUCTOR_pat$NUMBER(c, index);\n\
 			   sv_add_ub_proj(v,e);\n\
@@ -690,13 +661,10 @@ class setsort_gen =
 		            setif_register_rollback();\n\
 		           }\n\
 			   setif_register_ub_proj(sv_get_ub_projs(v),e);\n\
-	                   annotated_bounds_scan(sv_get_lbs(v),&scan);\n\
-			   while (annotated_bounds_next(&scan,&lb))\n\
+	                   bounds_scan(sv_get_lbs(v),&scan);\n\
+			   while (bounds_next(&scan,&lb))\n\
 			   {\n\
-			   annotations_scanner annot_scan;\n\
-			   annotation a_prime;\n\
-			   annotations_scan(lb->a,&annot_scan);\n\
-			   while(annotation_next(&annot_scan, &a_prime))\n\ setif_annotated_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,lb->e,e,a_prime);\n\
+			    setif_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,lb,e);\n\
 			   }\n\
 			   return c;\n\
 		          }\n\
@@ -780,8 +748,8 @@ class setsort_gen =
 	          else\n\
 	          {\n\
 		   $EXPRID e;\n\
-		   annotated_bound_entry lb; \n\
-		   annotated_bounds_scanner scan; \n\
+		   gen_e lb; \n\
+		   bounds_scanner scan; \n\
 		   c = $EPRIME_fresh(NULL);\n\
 		   e = $CONSTRUCTOR_pat$NUMBER(c);\n\
 		   sv_add_ub_proj(v,e);\n\
@@ -789,14 +757,11 @@ class setsort_gen =
 	            setif_register_rollback();\n\
 	           }\n\
 		   setif_register_ub_proj(sv_get_ub_projs(v),e);\n\
-                   annotated_bounds_scan(sv_get_lbs(v),&scan);\n\
-		   while (annotated_bounds_next(&scan,&lb))\n\
+                   bounds_scan(sv_get_lbs(v),&scan);\n\
+		   while (bounds_next(&scan,&lb))\n\
 		   {\n\
-		   	   annotations_scanner annot_scan;\n\
-			   annotation a_prime;\n\
-			   annotations_scan(lb->a,&annot_scan);\n\
-			   while(annotation_next(&annot_scan, &a_prime))\n\ setif_annotated_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,lb->e,e,a_prime);\n\
-		}\n\
+		    setif_inclusion($EXPRID_con_match,$EXPRID_res_proj,$EXPRID_print,lb,e);\n\
+		   }\n\
 		   return c;\n\
 	          }\n\
 	      }\n\
@@ -1009,11 +974,11 @@ class setsort_gen =
 		   Expr (e ^ "_print(arg1,temp);\n}"); ]
       in
       let base_statements = 
-	[ Expr ("fprintf(arg1,\"%s::%d\","
-		^"sv_get_name((setif_var)arg2),sv_get_stamp((setif_var)arg2));");
+	[ Expr ("fprintf(arg1,\"%s::%ld\","
+		^"sv_get_name((setif_var)arg2), (long) sv_get_stamp((setif_var)arg2));");
 	  Expr ("fprintf(arg1,\"0\");");
 	  Expr ("fprintf(arg1,\"1\");");
-	  Expr ("fprintf(arg1,setif_get_constant_name(arg2));") ] 
+	  Expr ("fprintf(arg1, \"%s\", setif_get_constant_name(arg2));") ] 
 	@ [union_statement] @ [inter_statement]
       in  
       let gen_proj_case (c,is_param, grp_opt) e' n =

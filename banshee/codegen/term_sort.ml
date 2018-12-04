@@ -37,9 +37,6 @@ open Sort_utils
 exception Variance of string
 
 
-
-(* TODO propagate annotations properly in inclusion functions *)
-
 let cfst ((a,b,c) : conid) = a
 
 (* generate a list of short circuited ors *)
@@ -390,7 +387,7 @@ class termsort_gen =
 		^"tv_get_name((term_var)ecr));");
 	  Expr ("fprintf(arg1,\"0\");");
 	  Expr ("fprintf(arg1,\"1\");");
-	  Expr ("fprintf(arg1,term_get_constant_name(ecr));") ] 
+	  Expr ("fprintf(arg1, \"%s\", term_get_constant_name(ecr));") ] 
       in  
       let gen_con_case ((c,is_param, grp_opt),consig) = 
 	let gen_con_rest e' n = 
