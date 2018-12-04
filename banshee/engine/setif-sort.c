@@ -1416,7 +1416,7 @@ void setif_rollback(banshee_rollback_info info)
   
   setif_rollback_info tinfo = (setif_rollback_info)info;
   
-  assert(tinfo->kind = setif_sort);
+  assert(tinfo->kind == setif_sort);
 
   lazy_invalidate_tlb_cache();
   term_hash_delete(setif_hash);

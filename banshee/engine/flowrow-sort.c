@@ -1310,7 +1310,7 @@ void flowrow_rollback(banshee_rollback_info info)
   
   flowrow_rollback_info rinfo = (flowrow_rollback_info)info;
   
-  assert(rinfo->kind = flowrow_sort);
+  assert(rinfo->kind == flowrow_sort);
   
   hash_table_scan(rinfo->added_edges, &hash_scan);
   while(hash_table_next(&hash_scan,(hash_key *)&st,
