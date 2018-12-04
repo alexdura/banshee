@@ -197,7 +197,7 @@ class setsort_gen =
 
     method private gen_deconstructor file hdr e c consig =
       let arity = List.length consig in
-      let macro = String.uppercase c ^ "_" in 
+      let macro = String.uppercase_ascii c ^ "_" in 
       let ret = no_qual (Ident ("struct " ^ c ^ "_decon")) in
       let f_name= c ^ "_decon" in
       let f_args = args [etype e] in
@@ -216,7 +216,7 @@ class setsort_gen =
 
   method private gen_param_deconstructor file hdr e c consig grp = 
 	  let arity = List.length consig in
-      let macro = String.uppercase c ^ "_" in 
+      let macro = String.uppercase_ascii c ^ "_" in 
       let ret = no_qual (Ident ("struct " ^ c ^ "_decon")) in
       let f_name= c ^ "_decon" in
       let f_args = args [etype e] in
@@ -263,7 +263,7 @@ class setsort_gen =
 	let args = args ((no_qual Int) :: (List.map (function (x,_) -> no_qual (Ident x)) consig)) in
 	let gen_body1 str i = [ Expr ("struct " ^ str ^ "_ *ret;");
 			    Expr ("stamp s[" ^ i ^ "];");
-			    Expr ("s[0] = " ^ (String.uppercase (str ^"_;")))] in
+			    Expr ("s[0] = " ^ (String.uppercase_ascii (str ^"_;")))] in
 	let body1 = (gen_body1 c num_args) @ [Expr ("s[" ^ last_index ^ "] = arg1;" )] in
 	let gbody1 = (gen_body1 grp last_index) in
 	let gen_s e n =     
@@ -309,9 +309,9 @@ class setsort_gen =
 	let gp,gf = gen_proto_and_fun ~quals:[] (ret,grp,gargs,gbody) in
 	let names = 
 			[("$CONSTRUCTOR",c);("$EXPRID",e);("$TYPE",ctype);("$GTYPE",gtype);("$GROUP",grp)] in
-	file#add_macro (define_val (String.uppercase (c ^ "_")) 
+	file#add_macro (define_val (String.uppercase_ascii (c ^ "_")) 
 					ctype);
-	file#add_macro (define_val (String.uppercase (grp ^ "_")) 
+	file#add_macro (define_val (String.uppercase_ascii (grp ^ "_")) 
 									gtype);  		
 	hdr#add_gdecl (decl_substitution names query_decl);
 	file#add_fdef (def_substitution names query_defn);
@@ -342,7 +342,7 @@ class setsort_gen =
 	args (List.map (function (x,_) -> no_qual (Ident x)) consig) in
       let body1 = [ Expr ("struct " ^ c ^ "_ *ret;");
 		    Expr ("stamp s[" ^ num_args ^ "];");
-		    Expr ("s[0] = " ^ (String.uppercase (c^"_;"))) ] in
+		    Expr ("s[0] = " ^ (String.uppercase_ascii (c^"_;"))) ] in
       let gen_s e n = 
 	Expr ("s[" ^ (int_to_string n) ^"] = "  
 	      ^ e ^ "_get_stamp((gen_e)arg" ^(int_to_string n) ^");") in
@@ -370,7 +370,7 @@ class setsort_gen =
       let p,f = gen_proto_and_fun ~quals:[] (ret,name,args,body) in
       let names = 
 	[("$CONSTRUCTOR",c);("$EXPRID",e);("$TYPE",ctype)] in
-      file#add_macro (define_val (String.uppercase (c ^ "_")) 
+      file#add_macro (define_val (String.uppercase_ascii (c ^ "_")) 
 			ctype);
       hdr#add_gdecl (decl_substitution names query_decl);
       file#add_fdef (def_substitution names query_defn);
@@ -387,10 +387,10 @@ class setsort_gen =
       let b1 = [Return ("(gen_e)&" ^ cname ^ "_")] in 
       let b2 = [Return ("((setif_term)arg1)->type == "  ^ cname ^ "_.st")] in
       let bodies = [|b1;b2|] in
-      file#add_macro (define_val (String.uppercase cname ^ "_")
+      file#add_macro (define_val (String.uppercase_ascii cname ^ "_")
 			(this#get_new_type()) );
-      file#add_gdecl (var ~init:("{" ^ (String.uppercase cname) ^ "_," 
-				 ^ (String.uppercase cname) ^ "_}")
+      file#add_gdecl (var ~init:("{" ^ (String.uppercase_ascii cname) ^ "_," 
+				 ^ (String.uppercase_ascii cname) ^ "_}")
 			(no_qual (Struct "setif_term"))
 		      ( cname ^ "_" ) (None));
       for i = 0 to 1 do
@@ -416,14 +416,14 @@ class setsort_gen =
 						  c ^ "Proj" ^ n ^ "_ *)arg2)->f0,get_" ^ c ^ "_proj" ^ n ^ 
 						  "_arg," ^ c ^ "_pat" ^ n ^ "_con_clos, (fresh_large_fn_ptr)" ^ e' ^
 						  "_fresh_large,(incl_fn_ptr)" ^ incl ^ "," ^ e ^ "_inclusion_ind)"	in
-							(String.uppercase c ^ "PROJ" ^ n ^ "_", Compound [Expr set;Return ret]) 
+							(String.uppercase_ascii c ^ "PROJ" ^ n ^ "_", Compound [Expr set;Return ret]) 
 						  end
 			| None -> begin
 				let ret = "setif_proj_merge(arg1," ^ "(gen_e)((struct " ^
 	  c ^ "Proj" ^ n ^ "_ *)arg2)->f0,get_" ^ c ^ "_proj" ^ n ^ 
 	  "_arg," ^ c ^ "_pat" ^ n ^ "_con, (fresh_large_fn_ptr)" ^ e' ^
 	  "_fresh_large,(incl_fn_ptr)" ^ incl ^ "," ^ e ^ "_inclusion_ind)"	in
-			(String.uppercase c ^ "PROJ" ^ n ^ "_", Return ret) 
+			(String.uppercase_ascii c ^ "PROJ" ^ n ^ "_", Return ret) 
 			end
       in
       let conid_cases (c,sig_option) = match sig_option with 
@@ -458,7 +458,7 @@ class setsort_gen =
 		in		
 		let e2 = Return "";
 		in
-		(String.uppercase cn ^ "PROJ" ^ n ^ "_", Condition (cond,e1,e2))
+		(String.uppercase_ascii cn ^ "PROJ" ^ n ^ "_", Condition (cond,e1,e2))
 	  in
       let gen_proj_case (c, is_param, grp_opt) n (e',v) = 
 	    let c' = match grp_opt with
@@ -469,7 +469,7 @@ class setsort_gen =
 	  incl(e',v) ^ "(((struct " ^ c ^ "_ *)arg1)->f" ^ n ^ "," ^
 	  "((struct " ^ c' ^ "Proj" ^ n ^ "_ *)arg2)->f0);"
 	in
-	(String.uppercase c' ^ "PROJ" ^ n ^ "_",Expr ret) 
+	(String.uppercase_ascii c' ^ "PROJ" ^ n ^ "_",Expr ret) 
       in
   let gen_param_con_case cn consig =	
 			let cond = "(((struct " ^ cn ^ "_ *)arg1)->index == ((struct " ^ cn ^ "_ *)arg2)->index)"
@@ -490,7 +490,7 @@ class setsort_gen =
 			in 
 			let e2 = Expr "handle_error(arg1,arg2,bek_cons_mismatch);"
 			in
-			(String.uppercase (cn ^ "_"),Condition(cond,e1,e2))
+			(String.uppercase_ascii (cn ^ "_"),Condition(cond,e1,e2))
 			in
       let gen_con_case c consig = 
 		let gen_field (e',v) n = 
@@ -505,7 +505,7 @@ class setsort_gen =
 	      Expr( ((gen_field b (int_to_string (!counter))) ^ ";" )) )
 	    consig 
 	in
-	(String.uppercase (c ^ "_"),Compound con_cases)
+	(String.uppercase_ascii (c ^ "_"),Compound con_cases)
 	in
 	  let gen_group_con_case cn grp consig =
 			let gen_field (e',v) n = 
@@ -520,17 +520,17 @@ class setsort_gen =
 		      Expr( ((gen_field b (int_to_string (!counter))) ^ ";" )) )
 		    consig 
 		in
-		(String.uppercase (cn ^ "_"), Compound con_cases)
+		(String.uppercase_ascii (cn ^ "_"), Compound con_cases)
       in
       let gen_other ((c,is_param, grp_opt),n) =
 		let result = ref ([] : (ident * statement) list) in
 			for i = (n-1) downto 0 do
 	  		result := match grp_opt with
-			| Some grp -> [(String.uppercase (c ^ "PROJ" ^ (int_to_string i) ^ "_"),
-		     	Return "");(String.uppercase (grp ^ "PROJ" ^ (int_to_string i) ^ "_"),
+			| Some grp -> [(String.uppercase_ascii (c ^ "PROJ" ^ (int_to_string i) ^ "_"),
+		     	Return "");(String.uppercase_ascii (grp ^ "PROJ" ^ (int_to_string i) ^ "_"),
 			     	Return "")] @(!result)
 			| None ->
-	    	(String.uppercase (c ^ "PROJ" ^ (int_to_string i) ^ "_"),
+	    	(String.uppercase_ascii (c ^ "PROJ" ^ (int_to_string i) ^ "_"),
 	     	Return "")::(!result)
 			done; (!result) in
       let gen_others (c,is_param, grp_opt) (others : (conid * int) list) = 
@@ -545,7 +545,7 @@ class setsort_gen =
 											(int_to_string (!counter)) b)
 	    										consig
 						in
-						(String.uppercase cn ^ "_",
+						(String.uppercase_ascii cn ^ "_",
 	 					Switch ("((setif_term)arg2)->type",
 						(gen_con_case cn consig)::(proj_cases) @ 
 		 				(gen_others c others),
@@ -567,12 +567,12 @@ class setsort_gen =
 											(int_to_string (!counter)) b)
 	    										consig
 						in
-						(String.uppercase cn ^ "_",
+						(String.uppercase_ascii cn ^ "_",
 		 					Switch ("((setif_term)arg2)->type",
 							(gen_param_con_case cn consig)::(proj_cases) @ (param_gproj_cases) @
 			 				(gen_others c others),
 			 				Expr "handle_error(arg1,arg2,bek_cons_mismatch);") )
-      |	(cn,_,_), None -> (String.uppercase cn ^ "_",
+      |	(cn,_,_), None -> (String.uppercase_ascii cn ^ "_",
 		 Expr "if (((setif_term)arg1)->type != ((setif_term)arg2)->type) handle_error(arg1,arg2,bek_cons_mismatch);  ";)
       in
 	  let gen_inner_group_switch ((c,consig_opt),others) = match c, consig_opt with 
@@ -593,7 +593,7 @@ class setsort_gen =
 										(int_to_string (!counter)) b)
     										consig
 				     in
-					(String.uppercase grp ^ "_",
+					(String.uppercase_ascii grp ^ "_",
 						Switch ("((setif_term)arg2)->type",
 						(gen_group_con_case cn grp consig)::(proj_cases) @ (param_proj_cases) @
 						(gen_others c others),
@@ -616,7 +616,7 @@ class setsort_gen =
       file#add_fdef f      
 
 	method private gen_param_proj_ops file header e e' c (n : string ) = 
-	  let macro = String.uppercase c ^ "PROJ" ^ n ^ "_" in
+	  let macro = String.uppercase_ascii c ^ "PROJ" ^ n ^ "_" in
       let header_decl =
 	"$EPRIME $CONSTRUCTOR_proj$NUMBER($EXPRID arg1, int index);" in
 	let gindexname = c ^ "_index_" ^ n in
@@ -701,7 +701,7 @@ class setsort_gen =
 	      in
 	      let names = 
 		[("$CONSTRUCTOR",c);("$NUMBER",n);("$EPRIME",e'); ("$INDEX", gindexname);
-		 ("$EXPRID",e);("$REGION",region);("$CAPCONS",String.uppercase c)] 
+		 ("$EXPRID",e);("$REGION",region);("$CAPCONS",String.uppercase_ascii c)] 
 	      in
 	      let fields = 
 		[(no_qual Int, "type");(no_qual (Ident "stamp"), "st");(no_qual Int, "index")]@
@@ -715,7 +715,7 @@ class setsort_gen =
 		
 	
     method private gen_proj_ops file header e e' c (n : string) = 
-      let macro = String.uppercase c ^ "PROJ" ^ n ^ "_" in
+      let macro = String.uppercase_ascii c ^ "PROJ" ^ n ^ "_" in
       let header_decl =
 	"$EPRIME $CONSTRUCTOR_proj$NUMBER($EXPRID arg1);" in
       let file_decl1 = 
@@ -797,7 +797,7 @@ class setsort_gen =
       in
       let names = 
 	[("$CONSTRUCTOR",c);("$NUMBER",n);("$EPRIME",e');
-	 ("$EXPRID",e);("$REGION",region);("$CAPCONS",String.uppercase c)] 
+	 ("$EXPRID",e);("$REGION",region);("$CAPCONS",String.uppercase_ascii c)] 
       in
       let fields = 
 	[(no_qual Int, "type");(no_qual (Ident "stamp"), "st")]@
@@ -809,7 +809,7 @@ class setsort_gen =
       header#add_gdecl (decl_substitution names header_decl);
 
   method private gen_param_pat_ops file hdr e e' c (n : string) =
-	  let macro = String.uppercase c ^ "PROJ" ^ n ^ "_" in
+	  let macro = String.uppercase_ascii c ^ "PROJ" ^ n ^ "_" in
       let name1 = c ^ "_pat" ^ n ^ "_con" in
 	  let cname1 = name1 ^ "_clos" in
 	  let indexname = c ^ "_index_" ^ n in
@@ -848,7 +848,7 @@ class setsort_gen =
       file#add_fdefs [f1;f2;cf1]
 
   method private gen_gproj_decl file hdr e e' c (n : string) =
-	  let macro = String.uppercase c ^ "PROJ" ^ n ^ "_" in
+	  let macro = String.uppercase_ascii c ^ "PROJ" ^ n ^ "_" in
   let fields = 
 	[(no_qual Int, "type");(no_qual (Ident "stamp"), "st")]@
 	[(etype e',"f0")] in
@@ -857,7 +857,7 @@ class setsort_gen =
 
     
   method private gen_pat_ops file hdr e e' c (n : string) = 
-      let macro = String.uppercase c ^ "PROJ" ^ n ^ "_" in
+      let macro = String.uppercase_ascii c ^ "PROJ" ^ n ^ "_" in
       let name1 = c ^ "_pat" ^ n ^ "_con" in
       let args1 = args [gen_e_type] in 
       let ret1 = gen_e_type in
@@ -982,7 +982,7 @@ class setsort_gen =
 	@ [union_statement] @ [inter_statement]
       in  
       let gen_proj_case (c,is_param, grp_opt) e' n =
-	(String.uppercase c ^ "PROJ" ^ n ^ "_",
+	(String.uppercase_ascii c ^ "PROJ" ^ n ^ "_",
 	 Compound 
 	   [ Expr ("fprintf(arg1,\"Proj[" ^ c ^ "," ^ n ^ ",\");");
 	     Expr ( e' ^ "_print(arg1,((struct " ^ 
@@ -1004,7 +1004,7 @@ class setsort_gen =
 	in
 	match consig with
 	| Some ((e',v) :: t) -> 
-	    (String.uppercase c ^ "_",
+	    (String.uppercase_ascii c ^ "_",
 	     Compound ([ Expr ("fprintf(arg1,\"" ^ c ^ "(\");");
 			 Expr (e' ^
 			       "_print(arg1,((struct " ^ c ^ "_ *)arg2)->f0);");
@@ -1013,9 +1013,9 @@ class setsort_gen =
 		       [ Expr ("fprintf(arg1,\")\");") ]
 			 )) 
 	| Some nil -> 
-	    (String.uppercase c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
+	    (String.uppercase_ascii c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
 	| None ->
-	    (String.uppercase c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
+	    (String.uppercase_ascii c ^ "_",Expr ("fprintf(arg1,\"" ^c ^ "\");"))
       in 
       let gen_proj_cases (c,consig) =
 	match consig with
