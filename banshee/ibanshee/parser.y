@@ -31,6 +31,8 @@
 
 /* Parser for iBanshee */
 %{
+#include <string.h>
+
 #include "nonspec.h"
 #include "regions.h"
 #include "hash.h"
@@ -207,8 +209,9 @@ static void ibanshee_init(void) {
 				      BANSHEE_PERSIST_KIND_gen_e);
 }
 
+int yylex();
 void flush_lexer(void);
-
+void yyerror(char *);
 %}			
 
 %start program
