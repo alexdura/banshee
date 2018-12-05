@@ -264,13 +264,13 @@ bool nonptr_data_set_fields(void *obj)
 
 bool funptr_data_serialize(FILE *f, void *obj)
 {
-  int id = 0;
+  INT_PTR id = 0;
   bool success;
   assert(f);
   assert(obj);
 
   success = hash_table_lookup(fn_ptr_table,(hash_key)obj, (hash_data*)&id);
-  success &= fwrite((void *)&id, sizeof(int), 1, f);
+  success &= fwrite((void *)&id, sizeof(INT_PTR), 1, f);
 
   if (!success) {
     fprintf(stderr, "Warning: failed to serialize a function pointer\n");
@@ -281,11 +281,11 @@ bool funptr_data_serialize(FILE *f, void *obj)
 
 void *funptr_data_deserialize(FILE *f)
 {
-  int id = 0;
+  INT_PTR id = 0;
   int success = 1;
   assert(f);
 
-  success &= fread((void *)&id, sizeof(int), 1, f);
+  success &= fread((void *)&id, sizeof(INT_PTR), 1, f);
   assert(success);
 
   return fn_ptr_array[id];
