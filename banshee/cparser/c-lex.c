@@ -74,7 +74,7 @@ location dummy_location;
 static size_t int_type_size;
 
 /* Cause the `yydebug' variable to be defined.  */
-#define YYDEBUG 1
+/* #define YYDEBUG 1 */
 
 #if USE_CPPLIB
 static unsigned char *yy_cur, *yy_lim;
