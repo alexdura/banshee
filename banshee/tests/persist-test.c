@@ -48,7 +48,7 @@
 
 /* Types */
 struct node_ {
-  int data;
+  INT_PTR data;
   struct node_ *left;
   struct node_ *right;
 };
@@ -61,14 +61,16 @@ static region test_rgn;
 /* Persistence support */
 bool node_serialize(FILE *f, void *obj)
 {
+  int success = 1;
   node n = (node) obj;
   
   assert(f);
   assert(obj);
 
-  fwrite((void *)&n->data, sizeof(int), 1, f);
-  fwrite((void *)&n->left, sizeof(void *), 1, f);
-  fwrite((void *)&n->right, sizeof(void *), 1, f);
+  success &= fwrite((void *)&n->data, sizeof(INT_PTR), 1, f);
+  success &= fwrite((void *)&n->left, sizeof(void *), 1, f);
+  success &= fwrite((void *)&n->right, sizeof(void *), 1, f);
+  assert(success);
 
   serialize_object(n->left, NODE_PERSIST_KIND);
   serialize_object(n->right, NODE_PERSIST_KIND);
@@ -79,11 +81,13 @@ bool node_serialize(FILE *f, void *obj)
 
 void *node_deserialize(FILE *f)
 {
+  int success = 1;
   node n = ralloc(test_rgn, struct node_);
   
-  fread((void *)&n->data, sizeof(int), 1, f);
-  fread((void *)&n->left, sizeof(void *), 1, f);
-  fread((void *)&n->right, sizeof(void *), 1, f);
+  success &= fread((void *)&n->data, sizeof(INT_PTR), 1, f);
+  success &= fread((void *)&n->left, sizeof(void *), 1, f);
+  success &= fread((void *)&n->right, sizeof(void *), 1, f);
+  assert(success);
 
   return n;
 }
@@ -225,7 +229,7 @@ static void pt_deserialize()
   if (n->left->right != n->left->left) {
     fail("n2's children were not deserialized correctly.\n");
   }
-  if (n->right->left != n->right->left) {
+  if (n->right->left != n->left->right) {
     fail("n3's children were not deserialized correctly.\n");
   }
   if (n->left->left != n->right->left) {
@@ -247,22 +251,22 @@ static void pt_deserialize()
     hash_table_scan(table,&scan);
 
     while(hash_table_next(&scan, &next_key, &next_data)) {
-      if ((int)next_data == 1) {
+      if ((INT_PTR)next_data == 1) {
 	if (strcmp("n1",next_key)) {
 	  fail("hash table doesn't map n1 correctly.\n");
 	}
       }
-      else if ((int)next_data == 2) {
+      else if ((INT_PTR)next_data == 2) {
 	if (strcmp("n2",next_key)) {
 	  fail("hash table doesn't map n2 correctly.\n");
 	}
       }
-      else if ((int)next_data == 3) {
+      else if ((INT_PTR)next_data == 3) {
 	if (strcmp("n3",next_key)) {
 	  fail("hash table doesn't map n3 correctly.\n");
 	}
       }
-      else if ((int)next_data == 4) {
+      else if ((INT_PTR)next_data == 4) {
 	if (strcmp("n4",next_key)) {
 	  fail("hash toble doesn't map n4 correctly.\n");
 	}
