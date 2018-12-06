@@ -114,8 +114,9 @@ Updater *read_extra_info(const char *filename)
 {
   unsigned long num_extra_regions = 0, i = 0;
   int next_id = 0, success;
-  FILE *f  = fopen(filename, "rb");
+  FILE *f  = NULL;
   Updater *result;
+  f = fopen(filename, "rb");
   assert(f);
 
   success = fread((void *)&num_extra_regions, sizeof(unsigned long), 1, f);

@@ -1,5 +1,5 @@
 /* This file was modified in 2000-2001 by David Gay for the RC compiler.
-   The changes are 
+   The changes are
    Copyright (c) 2000-2001 The Regents of the University of California.
 
    This file is distributed under the terms of the GNU General Public License
@@ -98,7 +98,7 @@ void yyerror(char *);
    yylval contains an IDENTIFIER_NODE which indicates which one.  */
 %token <u.itoken> TYPESPEC
 
-/* Reserved words that qualify types/functions: "const" or "volatile", 
+/* Reserved words that qualify types/functions: "const" or "volatile",
    "deletes".
    yylval contains an IDENTIFIER_NODE which indicates which one.  */
 %token <u.itoken> TYPE_QUAL FN_QUAL
@@ -174,10 +174,10 @@ void yyerror(char *);
 %type <u.cstmt> do_stmt_start
 %type <u.string> asm_clobbers string
 %type <u.telement> scspec type_qual type_spec
-%type <u.telement> declmods declmods_no_prefix_attr 
-%type <u.telement> reserved_declspecs reserved_declspecs_no_prefix_attr 
+%type <u.telement> declmods declmods_no_prefix_attr
+%type <u.telement> reserved_declspecs reserved_declspecs_no_prefix_attr
 %type <u.telement> typed_declspecs typed_declspecs_no_prefix_attr
-%type <u.telement> typed_typespecs reserved_typespecquals 
+%type <u.telement> typed_typespecs reserved_typespecquals
 %type <u.telement> typespec typespecqual_reserved structsp
 %type <u.telement> nonempty_type_quals type_quals
 %type <u.telement> maybe_type_qual fn_qual fn_quals
@@ -192,11 +192,11 @@ region parse_region;
 /* We'll see this a LOT below */
 #define pr parse_region
 
-/* Number of statements (loosely speaking) and compound statements 
+/* Number of statements (loosely speaking) and compound statements
    seen so far.  */
 static int stmt_count;
 static int compstmt_count;
-  
+
 /* List of types and structure classes of the current declaration.  */
 static type_element current_declspecs = NULL;
 static attribute prefix_attributes = NULL;
@@ -207,7 +207,7 @@ static attribute prefix_attributes = NULL;
 int unevaluated_expression;
 
 #ifdef RC_ADJUST
-static size_t rc_adjust_yystype(void *x, int by) 
+static size_t rc_adjust_yystype(void *x, int by)
 {
   struct yystype *p = x;
   RC_ADJUST_PREAMBLE;
@@ -233,7 +233,7 @@ static void rc_update_yystype(struct yystype *old, struct yystype *new)
 
 /* A stack of declspecs and attributes for use during parsing */
 typedef struct spec_stack *spec_stack;
-struct spec_stack { 
+struct spec_stack {
   type_element parentptr declspecs;
   attribute parentptr attributes;
   spec_stack sameregion next;
@@ -293,19 +293,19 @@ program: /* empty */
 extdefs:
 	{ $<u.telement>$ = NULL; } extdef { $$ = $2; }
 	| extdefs { $<u.telement>$ = NULL; } extdef
-		{ $$ = declaration_chain($1, $3); }	  
+		{ $$ = declaration_chain($1, $3); }
 	;
 
 extdef:
 	fndef
 	| datadef
 	| ASM_KEYWORD '(' expr ')' ';'
-		{ 
+		{
 		  $$ = CAST(declaration, new_asm_decl
 		    (pr, $1.location,
 		     new_asm_stmt(pr, $1.location, $3, NULL, NULL, NULL, NULL))); }
 	| extension extdef
-		{ pedantic = $1.i; 
+		{ pedantic = $1.i;
 		  $$ = CAST(declaration, new_extension_decl(pr, $1.location, $2)); }
 	;
 
@@ -314,7 +314,7 @@ datadef:
 		{ if (pedantic)
 		    error("ANSI C forbids data definition with no type or storage class");
 		  else if (!flag_traditional)
-		    warning("data definition has no type or storage class"); 
+		    warning("data definition has no type or storage class");
 
 		  $$ = CAST(declaration, new_data_decl(pr, $2->location, NULL, NULL, $2));
 		  pop_declspec_stack(); }
@@ -327,7 +327,7 @@ datadef:
         | declmods ';'
 	  { pedwarn("empty declaration"); }
 	| typed_declspecs setspecs ';'
-	  { shadow_tag($1); 
+	  { shadow_tag($1);
 	    $$ = CAST(declaration, new_data_decl(pr, $1->location, current_declspecs, prefix_attributes, NULL));
 	    pop_declspec_stack(); }
 	| error ';' { $$ = new_error_decl(pr, last_location); }
@@ -358,7 +358,7 @@ fndef:
 	  old_style_parm_decls
 		{ store_parm_decls($5); }
 	  compstmt_or_error
-		{ $$ = finish_function($7); 
+		{ $$ = finish_function($7);
 		  pop_declspec_stack(); }
 	| declmods setspecs notype_declarator error
 		{ $$ = new_error_decl(pr, last_location);
@@ -370,7 +370,7 @@ fndef:
 	  old_style_parm_decls
 		{ store_parm_decls($4); }
 	  compstmt_or_error
-		{ $$ = finish_function($6); 
+		{ $$ = finish_function($6);
 		  pop_declspec_stack(); }
 	| setspecs notype_declarator error
 		{ $$ = new_error_decl(pr, last_location);
@@ -440,7 +440,7 @@ unary_expr:
 	| unop cast_expr  %prec UNARY
 		{ $$ = make_unary($1.location, $1.i, $2);
 #if 0
-		  overflow_warning($$); 
+		  overflow_warning($$);
 #endif
 		}
 	/* Refer to the address of a label as a pointer.  */
@@ -450,12 +450,12 @@ unary_expr:
 		  use_label($2);
 		}
 	| sizeof unary_expr  %prec UNARY
-		{ 
+		{
 #if 0
 		  if (TREE_CODE ($2) == COMPONENT_REF
 		      && DECL_C_BIT_FIELD (TREE_OPERAND ($2, 1)))
 		    error("`sizeof' applied to a bit-field");
-		  $$ = c_sizeof (TREE_TYPE ($2)); 
+		  $$ = c_sizeof (TREE_TYPE ($2));
 #endif
 		  $$ = make_sizeof_expr($1.location, $2);
 		  unevaluated_expression--; }
@@ -466,7 +466,7 @@ unary_expr:
 		{ $$ = make_alignof_expr($1.location, $2);
 		  unevaluated_expression--; }
 	| alignof '(' typename ')'  %prec HYPERUNARY
-		{ $$ = make_alignof_type($1.location, $3); 
+		{ $$ = make_alignof_type($1.location, $3);
 		  unevaluated_expression--; }
 	;
 
@@ -482,16 +482,16 @@ cast_expr:
 	unary_expr
 	| '(' typename ')' cast_expr  %prec UNARY
 	  	{ $$ = make_cast($1.location, $2, $4); }
-	| '(' typename ')' '{' 
-		{ 
+	| '(' typename ')' '{'
+		{
 #if 0
 		  start_init (NULL, NULL, 0);
 		  $2 = groktypename ($2);
-		  really_start_incremental_init ($2); 
+		  really_start_incremental_init ($2);
 #endif
 		}
 	  initlist_maybe_comma '}'  %prec UNARY
-		{ 
+		{
 		  $$ = CAST(expression, new_cast_list(pr, $1.location, $2, CAST(expression, new_init_list(pr, $6->location, $6))));
 		  $$->type = $2->type;
 		  /* XXX: Evil hack for foo((int[5]) {1, 2, 3}) */
@@ -561,7 +561,7 @@ expr_no_commas:
 	  	{ $$ = make_conditional($2.location, $1, $3, $5); }
 	| expr_no_commas '?'
 		{ if (pedantic)
-		    pedwarn("ANSI C forbids omitting the middle term of a ?: expression"); 
+		    pedwarn("ANSI C forbids omitting the middle term of a ?: expression");
 		}
 	  ':' expr_no_commas
 	  	{ $$ = make_conditional($2.location, $1, NULL, $5); }
@@ -573,10 +573,10 @@ expr_no_commas:
 
 primary:
 	IDENTIFIER
-		{ 
+		{
 		  if (yychar == YYEMPTY)
 		    yychar = ' ';
-		  $$ = make_identifier($1.location, $1.id, yychar == '('); 
+		  $$ = make_identifier($1.location, $1.id, yychar == '(');
 		}
 	| CONSTANT { $$ = CAST(expression, $1); }
 	| string { $$ = CAST(expression, $1); }
@@ -593,7 +593,7 @@ primary:
 		    push_label_level();
 		}
 	  compstmt ')'
-		{ 
+		{
 		  pop_label_level();
 		  if (pedantic)
 		    pedwarn("ANSI C forbids braced-groups within expressions");
@@ -640,7 +640,7 @@ old_style_parm_decls:
 	| datadecls ELLIPSIS
 		/* ... is used here to indicate a varargs function.  */
 		{ if (pedantic)
-		    pedwarn("ANSI C does not permit use of `varargs.h'"); 
+		    pedwarn("ANSI C does not permit use of `varargs.h'");
 		  $$ = declaration_chain($1, CAST(declaration, new_ellipsis_decl(pr, $2.location)));
 		}
 	;
@@ -672,7 +672,7 @@ datadecl:
 		  pop_declspec_stack();
 		  pedwarn("empty declaration"); }
 	| declmods_no_prefix_attr ';'
-		{ pedwarn("empty declaration"); 
+		{ pedwarn("empty declaration");
 		  $$ = NULL; }
 	;
 
@@ -692,7 +692,7 @@ decls:
    Maintains a stack of outer-level values of current_declspecs,
    for the sake of parm declarations nested in function declarators.  */
 setspecs: /* empty */
-		{ 
+		{
 		  push_declspec_stack();
 		  pending_xref_error();
 		  split_type_elements($<u.telement>0,
@@ -703,9 +703,9 @@ setspecs: /* empty */
 /* ??? Yuck.  See after_type_declarator.  */
 setattrs: /* empty */
 		{ prefix_attributes = attribute_chain(prefix_attributes,
-						      $<u.attribute>0); 
+						      $<u.attribute>0);
 		/* This syntax is broken as it will apply to all remaining
-		   declarations, not just the current declarator 
+		   declarations, not just the current declarator
 		   (this is broken in base GCC too) */
 		/* XXX: Used extensively in the linux kernel. YUCK. */
 		/*error("Unsupported attribute syntax");*/ }
@@ -731,7 +731,7 @@ decl:
 	| declmods ';'
 		{ pedwarn("empty declaration"); }
 	| extension decl
-		{ pedantic = $1.i; 
+		{ pedantic = $1.i;
 		  $$ = CAST(declaration, new_extension_decl(pr, $1.location, $2)); }
 	;
 
@@ -894,7 +894,7 @@ maybe_attribute:
 	| attributes
 		{ $$ = $1; }
 	;
- 
+
 attributes:
       attribute
 		{ $$ = $1; }
@@ -913,7 +913,7 @@ attribute_list:
 	| attribute_list ',' attrib
 		{ $$ = attribute_chain($1, $3); }
 	;
- 
+
 attrib:
     /* empty */
 		{ $$ = NULL; }
@@ -946,7 +946,7 @@ init:
 	expr_no_commas
 	| '{'
 	  initlist_maybe_comma '}'
-		{ $$ = CAST(expression, new_init_list(pr, $1.location, $2)); 
+		{ $$ = CAST(expression, new_init_list(pr, $1.location, $2));
 		  $$->type = error_type; }
 	| error
 		{ $$ = make_error_expr(last_location); }
@@ -956,7 +956,7 @@ init:
 initlist_maybe_comma:
 	  /* empty */
 		{ if (pedantic)
-		    pedwarn("ANSI C forbids empty initializer braces"); 
+		    pedwarn("ANSI C forbids empty initializer braces");
 		  $$ = NULL; }
 	| initlist1 maybecomma { $$ = $1; }
 	;
@@ -1116,7 +1116,7 @@ structsp:
 		{ $<u.telement>$ = start_struct($1.location, kind_struct_ref, $2);
 		  /* Start scope of tag before parsing components.  */
 		}
-	  component_decl_list '}' maybe_attribute 
+	  component_decl_list '}' maybe_attribute
 		{ $<u.telement>$ = finish_struct($<u.telement>4, $5, $7); }
 	| STRUCT '{' component_decl_list '}' maybe_attribute
 		{ $$ = finish_struct(start_struct($1.location, kind_struct_ref, NULL),
@@ -1171,7 +1171,7 @@ component_decl_list2:	/* empty */
 		{ $$ = declaration_chain($1, $2); }
 	| component_decl_list2 ';'
 		{ if (pedantic)
-		    pedwarn("extra semicolon in struct or union specified"); 
+		    pedwarn("extra semicolon in struct or union specified");
 		   $$ = $1; }
 	;
 
@@ -1201,7 +1201,7 @@ component_decl:
 		{ if (pedantic)
 		    pedwarn("ANSI C forbids member declarations with no members");
 		  shadow_tag($1);
-		  $$ = CAST(declaration, new_data_decl(pr, $1->location, current_declspecs, prefix_attributes, NULL));	
+		  $$ = CAST(declaration, new_data_decl(pr, $1->location, current_declspecs, prefix_attributes, NULL));
 		  pop_declspec_stack(); }
 	| error
 		{ $$ = new_error_decl(pr, last_location); }
@@ -1340,7 +1340,7 @@ maybe_label_decls:
 	  /* empty */ { $$ = NULL; }
 	| label_decls
 		{ if (pedantic)
-		    pedwarn("ANSI C forbids label declarations"); 
+		    pedwarn("ANSI C forbids label declarations");
 		  $$ = $1; }
 	;
 
@@ -1395,12 +1395,12 @@ if_prefix:
 do_stmt_start:
 	  DO
 		{ stmt_count++;
-		  compstmt_count++; 
+		  compstmt_count++;
 		  $<u.cstmt>$ = CAST(conditional_stmt,
 				   new_dowhile_stmt(pr, $1.location, NULL, NULL));
 		 push_loop(CAST(statement, $<u.cstmt>$)); }
 	  labeled_stmt WHILE
-		{ $$ = $<u.cstmt>2; 
+		{ $$ = $<u.cstmt>2;
 		  $$->stmt = $3; }
 	;
 
@@ -1446,42 +1446,42 @@ stmt:
 		{ $$ = new_error_stmt(pr, last_location); }
 	| WHILE
 		{ stmt_count++; }
-	  '(' expr ')' 
-	        { check_condition("while", $4); 
+	  '(' expr ')'
+	        { check_condition("while", $4);
 		  $<u.cstmt>$ = CAST(conditional_stmt,
 			           new_while_stmt(pr, $1.location, $4, NULL));
 		  /* The condition is not "in the loop" for break or continue */
 		  push_loop(CAST(statement, $<u.cstmt>$)); }
 	  labeled_stmt
 		{ $$ = CAST(statement, $<u.cstmt>6);
-		  $<u.cstmt>6->stmt = $7; 
+		  $<u.cstmt>6->stmt = $7;
 		  pop_loop(); }
 	| do_stmt_start '(' expr ')' ';'
 		{ $$ = CAST(statement, $1);
 		  $1->condition = $3;
-		  check_condition("do-while", $3); 
+		  check_condition("do-while", $3);
 		  /* Note that pop_loop should be before the expr to be consistent
 		     with while, but GCC is inconsistent. See loop1.c */
 		  pop_loop(); }
 	| do_stmt_start error
-		{ $$ = new_error_stmt(pr, last_location); 
+		{ $$ = new_error_stmt(pr, last_location);
 		  pop_loop(); }
 	| FOR '(' xexpr ';' { stmt_count++; }
 		xexpr ';' { if ($6) check_condition("for", $6); }
-		xexpr ')' 
+		xexpr ')'
 		{ $<u.for_stmt>$ = new_for_stmt(pr, $1.location, $3, $6, $9, NULL);
 		  push_loop(CAST(statement, $<u.for_stmt>$)); }
 		labeled_stmt
 		{ $$ = CAST(statement, $<u.for_stmt>11);
-		  $<u.for_stmt>11->stmt = $12; 
+		  $<u.for_stmt>11->stmt = $12;
 		  pop_loop(); }
 	| SWITCH '(' expr ')'
-	        { stmt_count++; check_switch($3); 
+	        { stmt_count++; check_switch($3);
 		  $<u.cstmt>$ = CAST(conditional_stmt,
-			           new_switch_stmt(pr, $1.location, $3, NULL)); 
-		  push_loop(CAST(statement, $<u.cstmt>$)); } 
+			           new_switch_stmt(pr, $1.location, $3, NULL));
+		  push_loop(CAST(statement, $<u.cstmt>$)); }
 	  labeled_stmt
-		{ $$ = CAST(statement, $<u.cstmt>5); 
+		{ $$ = CAST(statement, $<u.cstmt>5);
 		  $<u.cstmt>5->stmt = $6;
 		  pop_loop(); }
 	| BREAK ';'
@@ -1496,11 +1496,11 @@ stmt:
 		}
 	| RETURN ';'
 		{ stmt_count++;
-		  $$ = CAST(statement, new_return_stmt(pr, $1.location, NULL)); 
+		  $$ = CAST(statement, new_return_stmt(pr, $1.location, NULL));
 		  check_void_return(); }
 	| RETURN expr ';'
 		{ stmt_count++;
-		  $$ = CAST(statement, new_return_stmt(pr, $1.location, $2)); 
+		  $$ = CAST(statement, new_return_stmt(pr, $1.location, $2));
 		  check_return($2); }
 	| ASM_KEYWORD maybe_type_qual '(' expr ')' ';'
 		{ stmt_count++;
@@ -1529,7 +1529,7 @@ stmt:
 		{ if (pedantic)
 		    pedwarn("ANSI C forbids `goto *expr;'");
 		  stmt_count++;
-		  $$ = CAST(statement, new_computed_goto_stmt(pr, $1.location, $3)); 
+		  $$ = CAST(statement, new_computed_goto_stmt(pr, $1.location, $3));
 		  check_computed_goto($3); }
 	| ';' { $$ = CAST(statement, new_empty_stmt(pr, $1.location)); }
 	;
@@ -1539,16 +1539,16 @@ stmt:
    also at the end of a compound statement.  */
 
 label:	  CASE expr_no_commas ':'
-		{ $$ = CAST(label, new_case_label(pr, $1.location, $2, NULL)); 
+		{ $$ = CAST(label, new_case_label(pr, $1.location, $2, NULL));
 		  check_case($$); }
 	| CASE expr_no_commas ELLIPSIS expr_no_commas ':'
-		{ $$ = CAST(label, new_case_label(pr, $1.location, $2, $4)); 
+		{ $$ = CAST(label, new_case_label(pr, $1.location, $2, $4));
 		  check_case($$); }
 	| DEFAULT ':'
-		{ $$ = CAST(label, new_default_label(pr, $1.location)); 
+		{ $$ = CAST(label, new_default_label(pr, $1.location));
 		  check_default($$); }
 	| id_label ':'
-		{ $$ = CAST(label, $1); 
+		{ $$ = CAST(label, $1);
 		  define_label($1); }
 	;
 

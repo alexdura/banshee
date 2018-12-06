@@ -176,6 +176,7 @@ static void pt_serialize()
 
 static void pt_deserialize()
 {
+  int success = 1;
   node n = NULL;
   FILE *infile = NULL;
   hash_table table = NULL;
@@ -198,10 +199,11 @@ static void pt_deserialize()
   }
 
   /* Read in the old address of n1 and store it as n */
-  fread((void *)&n, sizeof(void *), 1, infile);
+  success &= fread((void *)&n, sizeof(void *), 1, infile);
 
   /* Read in the old address of table and store it as table */
-  fread((void *)&table, sizeof(void *), 1, infile);
+  success &= fread((void *)&table, sizeof(void *), 1, infile);
+  assert(success);
 
   deserialize_all(infile, deserialize_fns, set_fields_fns, 5);
   

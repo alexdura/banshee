@@ -306,7 +306,7 @@ void *sv_info_deserialize(FILE *f)
   assert(f);
   assert(permanent);
 
-  /* fread((void *)&info->st, sizeof(stamp), 1, f); */
+/*   fread((void *)&info->st, sizeof(stamp), 1, f); */
 /*   fread((void *)&info->lbs, sizeof(bounds), 1, f); */
 /*   fread((void *)&info->ubs, sizeof(bounds), 1, f); */
 /*   fread((void *)&info->ub_projs, sizeof(gen_e_list), 1, f); */

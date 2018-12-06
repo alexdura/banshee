@@ -25,7 +25,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-CC=gcc
+#CC=gcc
 
 ifdef DEBUG_RALLOC
 CFLAGS = -g -pg -Wall -Ddeletes="" -DDEBUG_RALLOC -DNDEBUG -DNMEMDEBUG  -Werror -fno-common
@@ -39,11 +39,11 @@ TARGETS = libregions.a
 
 all: $(TARGETS) 
 
-regions.o: serialize.c regions.c pages.c alloc.c regions.h
-	gcc -c $(CFLAGS) -o regions.o regions.c
+regions.o: serialize.c regions.c pages.c alloc.c regions.h stats.c
+	$(CC) -c $(CFLAGS) -o regions.o regions.c
 
-profile.o: 
-	gcc -c $(CFLAGS) -o profile.o profile.c
+profile.o: profile.c
+	$(CC) -c $(CFLAGS) -o profile.o profile.c
 
 libregions.a: regions.o profile.o
 	$(AR) rcs $@ $^

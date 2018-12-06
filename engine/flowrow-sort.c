@@ -1413,14 +1413,14 @@ bool flowrow_rollback_set_fields(banshee_rollback_info i)
 void *flowrow_expr_deserialize(FILE *f)
 {
   int type = 0;
-  int success;
+  int success = 1;
 
 #ifdef NONSPEC
   int base_type = 0;
 #endif	/* NONSPEC */
 
   assert(f);
-  success = fread((void *)&type, sizeof(int), 1, f);
+  success &= fread((void *)&type, sizeof(int), 1, f);
 
 #ifdef NONSPEC
   if (type == ZERO_TYPE || type == ONE_TYPE || type == ABS_TYPE ||
@@ -1558,8 +1558,8 @@ void flowrow_serialize(FILE *f)
 
 void flowrow_deserialize(FILE *f)
 {
-  int success;
-  success = fread(&flowrow_hash, sizeof(term_hash), 1, f);
+  int success = 1;
+  success &= fread(&flowrow_hash, sizeof(term_hash), 1, f);
   success &= fread(&flowrow_current_rollback_info, sizeof(flowrow_rollback_info), 1, f);
   assert(success);
 }
@@ -1581,8 +1581,8 @@ void write_module_flowrow(FILE *f)
 
 void update_module_flowrow(translation t, FILE *f)
 {
-  int success;
-  success = fread(&flowrow_hash, sizeof(term_hash), 1, f);
+  int success = 1;
+  success &= fread(&flowrow_hash, sizeof(term_hash), 1, f);
   success &= fread(&flowrow_current_rollback_info, sizeof(flowrow_rollback_info), 1, f);
   assert(success);
   update_pointer(t, (void **)&flowrow_hash);

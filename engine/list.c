@@ -527,7 +527,7 @@ bool list_next(struct list_scanner *scan, void **data)
   else
     {
       if (data)
-	*data = scan->cur->data;
+        *data = scan->cur->data;
       scan->cur = scan->cur->next;
       return TRUE;
     }

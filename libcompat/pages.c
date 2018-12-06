@@ -386,7 +386,7 @@ struct page *alloc_new(int n, struct page *next)
   if (!newp)
     {
       if (nomem_h)
-	nomem_h();
+        nomem_h();
       abort();
     }
   assert(!((long)newp & (RPAGESIZE - 1)));

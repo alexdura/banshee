@@ -477,6 +477,23 @@ void dyck_finished_adding()
   return;
 }
 
+/*static int query_count = 0;*/
+#define MAX_QUERIES 50
+
+void regprofile(void);
+void inc_queries(void) {
+  /*
+  query_count++;
+  if (query_count > MAX_QUERIES) {
+    regprofile();
+    //printf("[debug] invalidating tlb cache after %d queries\n", MAX_QUERIES);
+    //fflush(stdout);
+    //invalidate_tlb_cache();
+    query_count =  0;
+  }
+  */
+}
+
 bool dyck_check_reaches(dyck_node n1, dyck_node n2)
 {  
   gen_e_list_scanner scan;
@@ -485,6 +502,8 @@ bool dyck_check_reaches(dyck_node n1, dyck_node n2)
   gen_e_list tlb = setif_tlb(n2->node_variable);
   
   assert(state == dyck_query);
+  
+  inc_queries();
   
   // check whether n1's constant is a member of n2
   gen_e_list_scan(tlb,&scan);
@@ -590,6 +609,8 @@ bool dyck_check_pn_reaches(dyck_node n1, dyck_node n2)
 
   assert (state == dyck_query);
 
+  inc_queries();
+
   if (!pn_reach) fail("PN reachability not enabled.");
 
   scratch = newregion();
@@ -613,6 +634,8 @@ dyck_node_list rdyck_reaches(region r, dyck_node n)
   
   assert(state == dyck_query);
   
+  inc_queries();
+
   result = new_dyck_node_list(r);
 
   gen_e_list_scan(tlb,&scan);
@@ -645,6 +668,8 @@ dyck_node_list rdyck_pn_reaches(region r, dyck_node n)
   dyck_node_list all_constants = NULL;
 
   assert (state == dyck_query);
+
+  inc_queries();
 
   if (!pn_reach) fail("PN reachability not enabled.");
 

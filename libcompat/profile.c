@@ -48,12 +48,23 @@ typedef struct Alloc_info
   struct Alloc_info *next;
   char *file;
   int line;
+  region r;
   unsigned long size;
   unsigned long calls;
 } *ainfo;
 
+typedef struct Region_info
+{
+  struct Region_info *next;
+  region r;
+  char *file;
+  int line;
+} *rinfo;
+
+
 static ainfo ainfos = NULL;
 static region profile_region = NULL;
+static rinfo rinfos = NULL;
 
 /* perror(s) then exit */
 void pfail(const char *s)
@@ -68,14 +79,14 @@ void pfail(const char *s)
  *                                                                        *
  **************************************************************************/
 
-static int registered_exit = 0;
+static int registered_exit = 1;//0;
 
-static ainfo find_ainfo(char *file, int line)
+static ainfo find_ainfo(char *file, int line, region r)
 {
   ainfo ai;
 
   for (ai = ainfos; ai; ai = ai->next)
-    if (line == ai->line && !strcmp(file, ai->file))
+    if (line == ai->line && !strcmp(file, ai->file) && ai->r == r)
       return ai;
 
   if (!registered_exit)
@@ -86,10 +97,11 @@ static ainfo find_ainfo(char *file, int line)
     }
 
   if (!profile_region)
-    profile_region = newregion();
+    profile_region = __newregion();
   ai = ralloc(profile_region, struct Alloc_info);
   ai->file = file;
   ai->line = line;
+  ai->r = r;
   ai->size = 0;
   ai->calls = 0;
   ai->next = ainfos;
@@ -183,7 +195,7 @@ static cinfo find_cinfo(void)
       return ci;
 
   if (!profile_region)
-    profile_region = newregion();
+    profile_region = __newregion();
   ci = ralloc(profile_region, struct Call_info);
   ci->stack = rarrayalloc(profile_region, REGION_PROFILE_DEPTH, void *);
   memcpy(ci->stack, calls, REGION_PROFILE_DEPTH*sizeof(void *));
@@ -196,9 +208,9 @@ static cinfo find_cinfo(void)
 }
 #endif
 
-static void add_alloc(char *file, int line, int size)
+static void add_alloc(char *file, int line, region r, int size)
 {
-  ainfo ai = find_ainfo(file, line);
+  ainfo ai = find_ainfo(file, line, r);
   ai->calls++;
   ai->size += size;
 #ifdef TRACE_STACK
@@ -212,6 +224,34 @@ static void add_alloc(char *file, int line, int size)
 #endif
 }
 
+static void del_allocs(region r) {
+  ainfo *ai;
+  rinfo *ri;
+
+  ai = &ainfos;
+  while (*ai) {
+    if ((*ai)->r == r) {
+      *ai = (*ai)->next;
+    }
+    else {
+      ai = &((*ai)->next);
+    }
+  }
+
+  ri = &rinfos;
+  while (*ri) {
+    if ((*ri)->r == r) {
+      *ri = (*ri)->next;
+      break;
+    }
+    else {
+      ri = &((*ri)->next);
+    }
+  }
+
+}
+
+
 /**************************************************************************
  *                                                                        *
  * Intercept and log calls to region library                              *
@@ -221,61 +261,96 @@ static void add_alloc(char *file, int line, int size)
 void *profile_typed_ralloc(region r, size_t size, type_t type, char *file,
 			   int line)
 {
-  add_alloc(file, line, size);
+  add_alloc(file, line, r, size);
   return typed_ralloc(r, size, type);
 }
 
 void *profile_typed_rarrayalloc(region r, size_t n, size_t size, type_t type,
 				char *file, int line)
 {
-  add_alloc(file, line, n*size);
+  add_alloc(file, line, r, n*size);
   return typed_rarrayalloc(r, n, size, type);
 }
 
 void *profile_typed_rarrayextend(region r, void *old, size_t n, size_t size,
 				 type_t type, char *file, int line)
 {
-  add_alloc(file, line, n*size); /* XXX: Fix */
+  add_alloc(file, line, r, n*size); /* XXX: Fix */
   return typed_rarrayextend(r, old, n, size, type);
 }
 
 char *profile_rstralloc(region r, size_t size, char *file, int line)
 {
-  add_alloc(file, line, size);
+  add_alloc(file, line, r, size);
   return rstralloc(r, size);
 }
 
 char *profile_rstralloc0(region r, size_t size, char *file, int line)
 {
-  add_alloc(file, line, size);
+  add_alloc(file, line, r, size);
   return rstralloc0(r, size);
 }
 
 char *profile_rstrdup(region r, const char *s, char *file, int line)
 {
-  add_alloc(file, line, strlen(s));
+  add_alloc(file, line, r, strlen(s));
   return rstrdup(r, s);
 }
 
 char *profile_rstrextend(region r, const char *old, size_t newsize,
 			 char *file, int line)
 {
-  add_alloc(file, line, newsize); /* XXX: Fix */
+  add_alloc(file, line, r, newsize); /* XXX: Fix */
   return rstrextend(r, old, newsize);
 }
 
 char *profile_rstrextend0(region r, const char *old, size_t newsize,
 			  char *file, int line)
 {
-  add_alloc(file, line, newsize); /* XXX: Fix */
+  add_alloc(file, line, r, newsize); /* XXX: Fix */
   return rstrextend0(r, old, newsize);
 }
 
 void *profile__rcralloc_small0(region r, size_t size, char *file, int line)
 {
-  add_alloc(file, line, size);
+  add_alloc(file, line, r, size);
   return __rc_ralloc_small0(r, size);
 }
+
+void profile_deleteregion(region r)
+{
+  del_allocs(r);
+  __deleteregion(r);
+}
+
+void profile_deleteregion_ptr(region *r)
+{
+  del_allocs(*r);
+  __deleteregion_ptr(r);
+}
+
+void profile_deleteregion_array(int n, region *regions)
+{
+  int i;
+  for (i = 0; i < n; i++)
+    del_allocs(regions[i]);
+
+  __deleteregion_array(n, regions);
+}
+
+region profile_newregion(char *file, int line) {
+  region r = __newregion();
+  if (!profile_region)
+    profile_region = __newregion();
+  rinfo ri = ralloc(profile_region, struct Region_info);
+  ri->file = file;
+  ri->line = line;
+  ri->r = r;
+  ri->next = rinfos;
+  rinfos = ri;
+  return r;
+}
+
 
 /**************************************************************************
  *                                                                        *
@@ -303,7 +378,7 @@ static list sort_list(list l, int (*cmp)(const void *, const void *))
   /* Compute length of list */
   for (cur = l, length = 0; cur; cur = cur->next, length++);
 
-  temp_region = newregion();
+  temp_region = __newregion();
   sorted = rarrayalloc(temp_region, length, list *);
   for (cur = l, i = 0; cur; cur = cur->next)
     sorted[i++] = cur;
@@ -316,7 +391,7 @@ static list sort_list(list l, int (*cmp)(const void *, const void *))
       result = sorted[i];
       result->next = cur;
     }
-  deleteregion(temp_region);
+  __deleteregion(temp_region);
   return result;
 }
 
@@ -337,6 +412,17 @@ static int finfo_cmp(const void *a, const void *b)
   finfo *afi = (finfo *) a;
   finfo *bfi = (finfo *) b;
   return (*afi)->size - (*bfi)->size;  /* Reverse order */
+}
+
+long region_profile_total_mem(void) {
+  long size = 0;
+  ainfo ai;
+
+  for (ai = ainfos; ai; ai = ai->next) {
+    size += ai->size;
+  }
+  //fprintf(stderr, "returning %lu\n", size); fflush(stderr);
+  return size;
 }
 
 static void print_finfos(void)
@@ -383,12 +469,25 @@ static void print_ainfos(void)
     {
       size += ai->size;
       calls += ai->calls;
-      fprintf(out, " %12lu | %8lu | %s:%d\n",
-	      ai->size, ai->calls, ai->file, ai->line);
+      fprintf(out, " %12lu | %8lu | %s:%d [reg: %p]\n",
+	      ai->size, ai->calls, ai->file, ai->line, ai->r);
     }
   fprintf(out, "  ------------+----------+---------------------\n");
     fprintf(out, " %12lu | %8lu | Total\n",
 	    size, calls);
+}
+
+static void print_rinfos(void)
+{
+  rinfo ri;
+
+  fprintf(out, "\n\nRegions\n");
+  fprintf(out, "----------------------------------------\n");
+  for (ri = rinfos; ri; ri = ri->next)
+    {
+      fprintf(out, "Region %p %s:%d\n", ri->r, ri->file, ri->line);
+    }
+  fprintf(out, "\n");
 }
 
 static finfo find_finfo(char *file)
@@ -413,6 +512,7 @@ static void gather_finfo(void)
 {
   ainfo ai;
 
+  finfos = NULL;
   for (ai = ainfos; ai; ai = ai->next)
     {
       finfo fi = find_finfo(ai->file);
@@ -467,7 +567,7 @@ static void start_prettiness(void)
 }
 
 /* Turn p into a file:line string */
-static char *prettify(void *p)
+char *prettify(void *p)
 {
 #define BUFSIZE 1024
   static char buf[BUFSIZE];
@@ -515,7 +615,8 @@ static void print_cinfos(void)
       calls += ci->calls;
       fprintf(out, " %12lu | %8lu | ", ci->size, ci->calls);
       for (i = 0; i < REGION_PROFILE_DEPTH; i++)
-	fprintf(out, "%s ", prettify(ci->stack[i]));
+        fprintf(out, "%p ", ci->stack[i]);
+      // fprintf(out, "%s ", prettify(ci->stack[i]));
       fprintf(out, "\n");
     }
   fprintf(out, "  ------------+----------+---------------------\n");
@@ -529,7 +630,10 @@ static void print_cinfos(void)
 void regprofile(void)
 {
   printf("Profiling!\n");
-  
+#ifdef TRACE_STACK
+  printf("depth=%d\n", REGION_PROFILE_DEPTH);
+#endif  
+
   if (profile_region == NULL) {
     printf("Profile region is null!\n");
     return;
@@ -551,6 +655,8 @@ void regprofile(void)
   fprintf(out, "\n");
   print_cinfos();
 #endif
+  print_rinfos();
 
   fclose(out);
+  out = NULL;
 }

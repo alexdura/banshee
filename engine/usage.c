@@ -55,8 +55,10 @@ long get_memusage(void)
   stat_file = fopen(filename, "r");
   if (!stat_file)
     {
-      perror(filename);
-      exit(EXIT_FAILURE);
+      //POLYVIOS: we might not be running on linux.  mac has no /proc
+      //perror(filename);
+      //exit(EXIT_FAILURE);
+      return -1;
     }
 
   /* Read in /proc/<pid>/stat */

@@ -35,6 +35,7 @@
 #define REGIONS_H
 
 #include "../engine/linkage.h"
+#include <inttypes.h>
 
 EXTERN_C_BEGIN
 
@@ -59,7 +60,7 @@ extern region permanent;
 
 void region_init(void);
 
-region newregion(void);
+region __newregion(void);
 region newsubregion(region parent);
 
 typedef int type_t;
@@ -91,9 +92,9 @@ char *__rc_rstrdup(region r, const char *s);
 char *__rc_rstrextend(region r, const char *old, size_t newsize);
 char *__rc_rstrextend0(region r, const char *old, size_t newsize);
 
-void deleteregion(region r);
-void deleteregion_ptr(region *r);
-void deleteregion_array(int n, region *regions);
+void __deleteregion(region r);
+void __deleteregion_ptr(region *r);
+void __deleteregion_array(int n, region *regions);
 region regionof(void *ptr);
 
 typedef void (*nomem_handler)(void);
@@ -122,6 +123,10 @@ extern char *__rc_file;
 #define rstrextend (RCDEBUG, __rc_rstrextend)
 #define rstrextend0 (RCDEBUG, __rc_rstrextend0)
 #define __rcralloc_small0 (RCDEBUG, __rc_ralloc_small0)
+#define deleteregion(r) __deleteregion(r)
+#define deleteregion_ptr(r) __deleteregion_ptr(r)
+#define deleteregion_array(n, regions) __deleteregion_array(n, regions)
+#define newregion() __newregion()
 #else
 #include "profile.h"
 #endif

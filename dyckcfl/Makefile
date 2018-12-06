@@ -45,7 +45,7 @@ banshee_exe = ../bin/banshee.exe
 
 DYCKCFL = dyckcfl
 
-TARGETS =  $(DYCKCFL).o mr_$(DYCKCFL).o $(DYCKCFL)_terms.h $(DYCKCFL)_spec.o $(DYCKCFL)_terms.c $(DYCKCFL)_terms.o 
+TARGETS =  $(DYCKCFL).o mr_$(DYCKCFL).o $(DYCKCFL)_terms.h $(DYCKCFL)_spec.o $(DYCKCFL)_terms.c $(DYCKCFL)_terms.o dyckcfl-replay.o dyckcfl-replay
 
 TAGFILES = $(wildcard *.c) $(wildcard *.h)
 
@@ -79,7 +79,6 @@ $(DYCKCFL)_terms.h: $(DYCKCFL)_terms.bsp
 $(DYCKCFL)_terms.c: $(DYCKCFL)_terms.bsp
 	$(banshee_exe) $(DYCKCFL)_terms.bsp
 
-
 TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
@@ -92,6 +91,9 @@ TAGS: $(TAGFILES)
 #	$(CC) -c -I$(engine_dir) -I$(region_dir) -I$(jni_dir) -Ddeletes= \
 #	-Dtraditional= -Dsameregion= -Dparentptr= -DNONSPEC -Wall JDyckCFLImp.c
 #	$(CC) -dynamiclib -o libjdyckcfl.jnilib dyckcfl.o JDyckCFLImp.o $(engine_dir)/libnsengine.a $(region_dir)/libregions.a -framework JavaVM
+
+dyckcfl-replay: dyckcfl-replay.o $(DYCKCFL).o
+	$(CC) $(CFLAGS) dyckcfl-replay.o $(DYCKCFL).o -o dyckcfl-replay -L$(region_dir) -L$(engine_dir) -lnsengine -lregions
 
 clean:
 	rm -f $(TARGETS) *~ JDyckCFL.class JDyckCFLImp.o libjdyckcfl.jnilib 

@@ -1,20 +1,31 @@
 #    This file is part of the RC compiler.
 #    Copyright (C) 2000-2001 The Regents of the University of California.
-# 
+#
 # RC is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2, or (at your option)
 # any later version.
-# 
+#
 # RC is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with RC; see the file COPYING.  If not, write to
 # the Free Software Foundation, 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
+
+.INTERMEDIATE: \
+               AST_defs.c\
+               AST_defs.h\
+               AST_parent.c\
+               AST_print.c\
+               AST_types.h\
+               c-gperf.h\
+               c-parse.tab.c\
+               c-parse.tab.h
+
 
 OBJS = $(O)AST.o $(O)AST_utils.o $(O)array.o $(O)bitset.o $(O)builtins.o $(O)c-parse.tab.o $(O)c-lex.o \
        $(O)callcc1.o $(O)cfg.o $(O)constants.o $(O)cval.o $(O)dd_list.o $(O)edit.o \
@@ -83,7 +94,7 @@ $(O)temps.o: temps.c $(HDRS)
 $(O)dhash.o: dhash.c $(HDRS)
 $(O)array.o: array.c $(HDRS)
 $(O)graph.o: graph.c $(HDRS)
-$(O)dd_list.o: dd_list.c dd_list.h 
+$(O)dd_list.o: dd_list.c dd_list.h
 $(O)sd_list.o: sd_list.c sd_list.h
 $(O)bitset.o: bitset.c bitset.h config.h cstring.h
 $(O)mbchar.o: mbchar.c mbchar.h

@@ -155,7 +155,7 @@ void initregion(region r)
   set_region(r->normal.pages, 1, r);
 }
 
-region newregion(void)
+region __newregion(void)
 {
   return newsubregion(permanent);
 }
@@ -304,21 +304,21 @@ static void delregion(region r)
   free_all_pages(r, &r->normal);
 }
 
-void deleteregion(region r)
+void __deleteregion(region r)
 {
   unlink_region(r);
   delregion(r);
 }
 
-void deleteregion_ptr(region *r)
+void __deleteregion_ptr(region *r)
 {
   region tmp = *r;
 
   *r = NULL;
-  deleteregion(tmp);
+  __deleteregion(tmp);
 }
 
-void deleteregion_array(int n, region *regions)
+void __deleteregion_array(int n, region *regions)
 {
   int i;
 
@@ -348,7 +348,7 @@ void region_init(void)
     {
       /* rstart = -64; Save 64 bytes of memory! (sometimes ;-)) REMOVED aa */
       init_pages();
-      permanent = newregion();
+      permanent = __newregion();
       if (getenv("REGIONSTATS"))
 	benchmark_init();
 #ifdef DEBUG_RALLOC

@@ -421,6 +421,8 @@ void update_module_nonspec(translation t, FILE *f);
 /* Print out statistics for the constraint system */
 void nonspec_stats(FILE *f);
 
+void invalidate_tlb_cache(void);
+
 EXTERN_C_END
 
 #endif /* NONSPEC_H */

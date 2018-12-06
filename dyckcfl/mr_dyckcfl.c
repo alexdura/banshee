@@ -28,8 +28,8 @@
  *
  */
 
-#include <assert.h>		// assert
-#include <string.h>		// strcmp
+#include <assert.h> // assert
+#include <string.h> // strcmp
 #include "mr_dyckcfl.h"
 #include "nonspec.h"
 #include "hash.h"
@@ -105,7 +105,7 @@ static void check_erroneous_edges(void)
   mr_dyck_node_list_scan(mr_erroneous_sources,&scan);
   
   while(mr_dyck_node_list_next(&scan,&next_source)) {
-    state = mr_dyck_query; 	// HACK to allow queries here
+    state = mr_dyck_query; // HACK to allow queries here
     if (mr_dyck_check_reaches(next_source,mr_erroneous_sink)) {
       found = TRUE;
       expr_print(stdout, next_source->node_constant);
@@ -128,9 +128,9 @@ static bool relevant_constraint(int num)
     relevant_constraint_list_scanner scan;
     INT_PTR next;
 
-    relevant_constraint_list_scan(relevant_constraints,&scan);
+    relevant_constraint_list_scan(relevant_constraints, &scan);
 
-    while(relevant_constraint_list_next(&scan,&next)) {
+    while(relevant_constraint_list_next(&scan, &next)) {
       if (num == next) return TRUE;
     }
   }
@@ -343,7 +343,7 @@ void mr_dyck_init(bool pn,FILE *rconstraints)
     while (fgets(buf,100,rconstraints)) {
       INT_PTR next_relevant = atoi(buf);
       assert(next_relevant);
-      //	printf("%d\n",next_relevant);
+      // printf("%d\n",next_relevant);
       relevant_constraint_list_cons(next_relevant, relevant_constraints);
     }
     fclose(rconstraints);
@@ -372,7 +372,6 @@ void mr_dyck_reset()
   mr_erroneous_sink = NULL;
 #endif
 
-
   state = mr_dyck_raw;
 }
 
@@ -399,7 +398,6 @@ mr_dyck_node make_tagged_mr_dyck_node(const char *name)
 
   return result;
 }
-
 
 mr_dyck_node make_untagged_mr_dyck_node(const char *name)
 {
@@ -431,7 +429,7 @@ mr_dyck_node make_tagged_empty_mr_dyck_node(const char *name)
 
   return result;
 }
-					   
+
 mr_dyck_node make_tagged_universal_mr_dyck_node(const char *name)
 {
   mr_dyck_node result = ralloc(mr_dyckregion, struct mr_dyck_node_);
@@ -505,26 +503,26 @@ static void encode_productions(void)
 
   assert(state == mr_dyck_inited);
 
-  mr_dyck_node_list_scan(mr_all_nodes,&scan);
+  mr_dyck_node_list_scan(mr_all_nodes, &scan);
 
   // for each node in the graph 
-  while (mr_dyck_node_list_next(&scan,&next_node)) {
+  while (mr_dyck_node_list_next(&scan, &next_node)) {
     // encode each S -> epsilon production
-    make_mr_dyck_subtype_edge(next_node,next_node);
+    make_mr_dyck_subtype_edge(next_node, next_node);
     // encode each S -> S S production
     encode_SSS_production(next_node);
  
-    hash_table_scan(mr_seen_indices,&index_scan);
+    hash_table_scan(mr_seen_indices, &index_scan);
     // for each index i
-    while (hash_table_next(&index_scan,(hash_data *)&next_index,NULL)) {
+    while (hash_table_next(&index_scan, (hash_data *)&next_index, NULL)) {
       // encode each K_i -> (_i S production
-      encode_KOS_production(next_node,next_index);
+      encode_KOS_production(next_node, next_index);
       // encode each S -> K_i )_i production
-      encode_SKC_production(next_node,next_index);
+      encode_SKC_production(next_node, next_index);
       // encode each n --)_i--> n production (on global nodes)
       if (next_node->global) {
-		make_mr_dyck_open_edge(next_node,next_node,next_index);
- 		make_mr_dyck_close_edge(next_node,next_node,next_index);
+        make_mr_dyck_open_edge(next_node, next_node, next_index);
+        make_mr_dyck_close_edge(next_node, next_node, next_index);
       }
     }
   }
@@ -538,8 +536,7 @@ static void encode_pn_productions(void)
   // start by encoding all the standard productions
   encode_productions();
 
-
-  mr_dyck_node_list_scan(mr_all_nodes,&scan);
+  mr_dyck_node_list_scan(mr_all_nodes, &scan);
   // for each node in the graph
   while (mr_dyck_node_list_next(&scan,&next_node)) {
     // encode each start -> PN production
@@ -571,7 +568,7 @@ void mr_dyck_finished_adding()
 }
 
 static bool mr_dyck_check_onelevel_reaches(mr_dyck_node n1, mr_dyck_node n2, 
-					   constructor c)
+            constructor c)
 {
   gen_e_list_scanner scan;
   gen_e next_lb;
@@ -597,7 +594,7 @@ static bool mr_dyck_check_onelevel_reaches(mr_dyck_node n1, mr_dyck_node n2,
       gen_e_list_scan(contents_tlb,&contents_scan);
       
       while(gen_e_list_next(&contents_scan,&contents_next)) {
-	if (expr_eq(n2->node_constant,contents_next)) return TRUE;
+        if (expr_eq(n2->node_constant,contents_next)) return TRUE;
       }
     }
   }
@@ -650,25 +647,23 @@ void mr_dyck_print_closed_graph(FILE *f)
       
       // Just s constructors
       if (sdecon.arity == 1 && !strcmp(sdecon.name,"s")) {
-	gen_e_list_scanner contents_scan;
-	gen_e contents_next;
-	gen_e_list contents_tlb = setif_tlb(sdecon.elems[0]);
-	gen_e_list_scan(contents_tlb,&contents_scan);
-	
-	while(gen_e_list_next(&contents_scan,&contents_next)) {
-	  assert(next_node->node_constant);
-	  
-	  if (expr_is_constant(contents_next)) {
-	    fprintf(f,"\"");
-	    expr_print(f,next_node->node_constant);
-	    fprintf(f,"\" -> \"");
-	    expr_print(f,contents_next);
-	    fprintf(f,"\" [label=\"%s\"];\n",sdecon.name);
-	  }
-	} 
-      }
+        gen_e_list_scanner contents_scan;
+        gen_e contents_next;
+        gen_e_list contents_tlb = setif_tlb(sdecon.elems[0]);
+        gen_e_list_scan(contents_tlb,&contents_scan);
 
-	
+        while(gen_e_list_next(&contents_scan,&contents_next)) {
+          assert(next_node->node_constant);
+          
+          if (expr_is_constant(contents_next)) {
+            fprintf(f,"\"");
+            expr_print(f,next_node->node_constant);
+            fprintf(f,"\" -> \"");
+            expr_print(f,contents_next);
+            fprintf(f,"\" [label=\"%s\"];\n",sdecon.name);
+          }
+        } 
+      }
     }
   }
   fprintf(f,"\n}");

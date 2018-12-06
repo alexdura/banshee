@@ -1,5 +1,5 @@
 /* This file was modified in 2000-2001 by David Gay for the RC compiler.
-   The changes are 
+   The changes are
    Copyright (c) 2000-2001 The Regents of the University of California.
 
    This file is distributed under the terms of the GNU General Public License
@@ -40,7 +40,7 @@ Boston, MA 02111-1307, USA.  */
 /* On FreeBSD, alloca is defined in stdlib, on most other platforms,
    (cygwin, linux) it is in alloca.h */
 #ifndef __FreeBSD__
-#include <alloca.h> 
+#include <alloca.h>
 #endif
 //#define alloca(size)   __builtin_alloca (size)
 
@@ -74,7 +74,10 @@ location dummy_location;
 static size_t int_type_size;
 
 /* Cause the `yydebug' variable to be defined.  */
-/* #define YYDEBUG 1 */
+#ifdef YYDEBUG
+#undef YYDEBUG
+#endif
+#define YYDEBUG 1
 
 #if USE_CPPLIB
 static unsigned char *yy_cur, *yy_lim;
@@ -732,7 +735,7 @@ linenum:
 		  struct file_stack *p = input_file_stack;
 		  if (indent_level != p->indent_level)
 		    {
-		      warning_with_file_and_line 
+		      warning_with_file_and_line
 			(p->name, old_lineno,
 			 "This file contains more `%c's than `%c's.",
 			 indent_level > p->indent_level ? '{' : '}',
@@ -991,7 +994,7 @@ static int read_char(char *context, char terminating_char,
 	{
 	  warning ("Ignoring invalid multibyte character");
 	  /* Note: gcc just takes the character following the
-	     invalid multibyte-char-sequence as being the next 
+	     invalid multibyte-char-sequence as being the next
 	     character. This is obviously incorrect. */
 	  TUNGETC (c);
 	  goto tryagain;
@@ -1565,7 +1568,7 @@ yylex ()
 	    else
 	      {
 		int i;
-		
+
 		for (i = 0; i < count; i++)
 		  *p++ = cbuf[i];
 	      }
@@ -1581,7 +1584,7 @@ yylex ()
 	break;
       }
 
-    case '@': 
+    case '@':
       value = '*';
       break;
 
@@ -1684,14 +1687,14 @@ yylex ()
 	    }
 	TUNGETC (c1);
 
-	if (c == '<') 
+	if (c == '<')
 	  {
 	    value = ARITHCOMPARE;
 	    yylval.u.itoken.i = kind_lt;
 	  }
 	else if (c == '>')
 	  {
-	    value = ARITHCOMPARE;	
+	    value = ARITHCOMPARE;
 	    yylval.u.itoken.i = kind_gt;
 	  }
 	else

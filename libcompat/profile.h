@@ -45,6 +45,10 @@ char *profile_rstrdup(region r, const char *s, char *file, int line);
 char *profile_rstrextend(region r, const char *old, size_t newsize, char *file, int line);
 char *profile_rstrextend0(region r, const char *old, size_t newsize, char *file, int line);
 void *profile__rcralloc_small0(region r, size_t size, char *file, int line);
+void profile_deleteregion(region r);
+void profile_deleteregion_ptr(region *r);
+void profile_deleteregion_array(int n, region *regions);
+region profile_newregion(char *file, int line);
 
 #ifdef REGION_PROFILE
 #define typed_ralloc(r, size, type) profile_typed_ralloc(r, size, type, __FILE__, __LINE__)
@@ -58,8 +62,13 @@ void *profile__rcralloc_small0(region r, size_t size, char *file, int line);
 #define rstrextend(r, old, newsize) profile_rstrextend(r, old, newsize, __FILE__, __LINE__)
 #define rstrextend0(r, old, newsize) profile_rstrextend0(r, old, newsize, __FILE__, __LINE__)
 #define __rcralloc_small0(r, size) profile__rcralloc_small0(r, size, __FILE__, __LINE__)
+#define deleteregion(r) profile_deleteregion(r)
+#define deleteregion_ptr(r) profile_deleteregion_ptr(r)
+#define deleteregion_array(n, regions) profile_deleteregion_array(n, regions)
+#define newregion() profile_newregion(__FILE__, __LINE__)
 #endif
 
 void regprofile(void);
+long region_profile_total_mem(void);
 
 #endif
