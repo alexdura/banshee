@@ -272,7 +272,7 @@ void *banshee_rollback_info_deserialize(FILE *f)
   assert(f);
 
   success = fread((void *)&time, sizeof(time), 1, f);
-  success &= fread((void *)&kind, sizeof(kind), 1, f);
+  success = success && fread((void *)&kind, sizeof(kind), 1, f);
   assert(success);
 
   result = banshee_rollback_deserialize_dispatch(kind, f);
@@ -304,7 +304,7 @@ void engine_deserialize(FILE *f)
   assert(f);
 
   success = fread((void *)&banshee_clock, sizeof(banshee_clock), 1, f);
-  success &= fread((void *)&rb_stack, sizeof(banshee_rollback_stack), 1, f);
+  success = success && fread((void *)&rb_stack, sizeof(banshee_rollback_stack), 1, f);
   assert(success);
 }
 
@@ -317,7 +317,7 @@ void update_module_engine(translation t, FILE *f)
 {
   int success;
   success = fread((void *)&banshee_clock, sizeof(banshee_clock), 1, f);
-  success &= fread((void *)&rb_stack, sizeof(banshee_rollback_stack), 1, f);
+  success = success && fread((void *)&rb_stack, sizeof(banshee_rollback_stack), 1, f);
   assert(success);
   update_pointer(t, (void **)&rb_stack);
 }

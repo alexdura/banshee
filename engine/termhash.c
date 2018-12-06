@@ -314,12 +314,12 @@ void *term_hash_deserialize(FILE *f)
 
   for (i = 0; i < inserts; i++) {
     int length;
-    success &= fread((void *)&length, sizeof(length), 1, f);
+    success = success && fread((void *)&length, sizeof(length), 1, f);
     {
       gen_e e;
       stamp sig[length];
-      success &= (fread((void *)sig, sizeof(stamp), length, f) == length);
-      success &= fread((void *)&e, sizeof(gen_e), 1, f);
+      success = success && (fread((void *)sig, sizeof(stamp), length, f) == length);
+      success = success && fread((void *)&e, sizeof(gen_e), 1, f);
       term_hash_insert(result, e, sig, length);
     }
   }

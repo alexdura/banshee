@@ -1973,11 +1973,11 @@ void *cons_group_deserialize(FILE *f)
   cons_group g = ralloc(cons_group_region, struct cons_group_);
   assert(f);
 
-  success &= fread((void *)&g->arity, sizeof(int), 1, f);
+  success = success && fread((void *)&g->arity, sizeof(int), 1, f);
   g->name = (char *)string_data_deserialize(f);
   g->sig = rarrayalloc(permanent, g->arity, sig_elt);
-  success &= (fread((void *)g->sig, sizeof(sig_elt), g->arity, f) == g->arity);
-  success &= fread((void *)&g->gid, sizeof(int), 1, f);
+  success = success && (fread((void *)g->sig, sizeof(sig_elt), g->arity, f) == g->arity);
+  success = success && fread((void *)&g->gid, sizeof(int), 1, f);
   assert(success);
 
   return g;
@@ -2011,11 +2011,11 @@ static void *setif_proj_pat_deserialize(FILE *f)
   int success = 1;
   proj_pat pat = ralloc(proj_pat_region, struct proj_pat_);
   assert(f);
-  success &= fread((void *)&pat->st, sizeof(int), 1, f);
-  success &= fread((void *)&pat->i, sizeof(int), 1, f);
-  success &= fread((void *)&pat->exp, sizeof(void *), 1, f);
-  success &= fread((void *)&pat->variance, sizeof(int), 1, f);
-  success &= fread((void *)&pat->c, sizeof(constructor), 1, f);
+  success = success && fread((void *)&pat->st, sizeof(int), 1, f);
+  success = success && fread((void *)&pat->i, sizeof(int), 1, f);
+  success = success && fread((void *)&pat->exp, sizeof(void *), 1, f);
+  success = success && fread((void *)&pat->variance, sizeof(int), 1, f);
+  success = success && fread((void *)&pat->c, sizeof(constructor), 1, f);
   assert(success);
   
   return pat;
@@ -2050,10 +2050,10 @@ static void *setif_gproj_pat_deserialize(FILE *f)
   gproj_pat gpat = ralloc(gproj_pat_region, struct gproj_pat_);
   assert(f);
 
-  success &= fread((void *)&gpat->st, sizeof(stamp), 1, f);
-  success &= fread((void *)&gpat->i, sizeof(int), 1, f);
-  success &= fread((void *)&gpat->exp, sizeof(void *), 1, f);
-  success &= fread((void *)&gpat->g, sizeof(cons_group), 1, f);
+  success = success && fread((void *)&gpat->st, sizeof(stamp), 1, f);
+  success = success && fread((void *)&gpat->i, sizeof(int), 1, f);
+  success = success && fread((void *)&gpat->exp, sizeof(void *), 1, f);
+  success = success && fread((void *)&gpat->g, sizeof(cons_group), 1, f);
   assert(success);
 
   return gpat;
@@ -2095,14 +2095,14 @@ static void *cons_expr_deserialize(FILE *f)
   cons_expr e = ralloc(cons_expr_region, struct cons_expr_);
   assert(f);
 
-  success &= fread((void *)&e->st, sizeof(stamp), 1, f);
-  success &= fread((void *)&e->arity, sizeof(int), 1, f);
+  success = success && fread((void *)&e->st, sizeof(stamp), 1, f);
+  success = success && fread((void *)&e->arity, sizeof(int), 1, f);
   e->name = (char *)string_data_deserialize(f);
   e->sig = rarrayalloc(permanent, e->arity, sig_elt);
   e->exps = rarrayalloc(permanent, e->arity, gen_e);
-  success &= (fread((void *)e->sig, sizeof(sig_elt), e->arity, f) == e->arity);
-  success &= (fread((void *)e->exps, sizeof(gen_e), e->arity, f) == e->arity);
-  success &= fread((void *)&e->c, sizeof(constructor), 1, f);
+  success = success && (fread((void *)e->sig, sizeof(sig_elt), e->arity, f) == e->arity);
+  success = success && (fread((void *)e->exps, sizeof(gen_e), e->arity, f) == e->arity);
+  success = success && fread((void *)&e->c, sizeof(constructor), 1, f);
   assert(success);
 
   return e;
@@ -2170,7 +2170,7 @@ static void *setif_expr_deserialize(FILE *f)
   setif_term result = NULL;
 
   assert(f);
-  success &= fread((void *)&expr_type, sizeof(int), 1, f);
+  success = success && fread((void *)&expr_type, sizeof(int), 1, f);
   assert(success);
 
   switch(expr_type) 
@@ -2309,7 +2309,7 @@ static void *term_expr_deserialize(FILE *f)
   int success = 1;
   int expr_type;
   gen_term result = NULL;
-  success &= fread((void *)&expr_type, sizeof(int), 1, f);
+  success = success && fread((void *)&expr_type, sizeof(int), 1, f);
   assert(success);
 
   switch(expr_type) 
@@ -2395,7 +2395,7 @@ void *gen_e_deserialize(FILE *f)
   sort_kind sort;
   assert(f);
 
-  success &= fread((void *)&sort, sizeof(sort), 1, f);
+  success = success && fread((void *)&sort, sizeof(sort), 1, f);
   assert(success);
 
   switch(sort) 
@@ -2458,12 +2458,12 @@ void *constructor_deserialize(FILE *f)
 {
   int success = 1;
   constructor c = ralloc(constructor_region, struct constructor_);
-  success &= fread((void *)&c->sort, sizeof(int), 1, f);
-  success &= fread((void *)&c->type, sizeof(int), 1, f);
-  success &= fread((void *)&c->arity, sizeof(int), 1, f);
+  success = success && fread((void *)&c->sort, sizeof(int), 1, f);
+  success = success && fread((void *)&c->type, sizeof(int), 1, f);
+  success = success && fread((void *)&c->arity, sizeof(int), 1, f);
   c->name = (char *)string_data_deserialize(f);
   c->sig = rarrayalloc(permanent, c->arity, sig_elt);
-  success &= (fread((void *)c->sig, sizeof(sig_elt), c->arity, f) == c->arity);
+  success = success && (fread((void *)c->sig, sizeof(sig_elt), c->arity, f) == c->arity);
   assert(success);
 
   return c;
@@ -2555,11 +2555,11 @@ hash_table *deserialize_cs(FILE *f)
   engine_reset();
 
   /* Read the size of the array */
-  success &= fread((void *)&sz, sizeof(unsigned long), 1, f);
+  success = success && fread((void *)&sz, sizeof(unsigned long), 1, f);
   entry_points = rarrayalloc(permanent, sz, hash_table);
 
   /* Read the address of each table */
-  success &= (fread((void *)entry_points, sizeof(hash_table), sz, f) == sz);
+  success = success && (fread((void *)entry_points, sizeof(hash_table), sz, f) == sz);
   assert(success);
 
   /* Call deserialize on each module */

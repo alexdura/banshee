@@ -559,7 +559,7 @@ void prt_qualifier(qualifier q)
   /* We drop all const's in the output to allow initialisers to be moved to
      the start of the block. This is not a big issue, as we have already
      type-checked the input program. */
-  if (q->id == volatile_qualifier || (q->id == const_qualifier && allow_const_evil_hack))
+  if ((int)q->id == (int)volatile_qualifier || ((int)q->id == (int)const_qualifier && allow_const_evil_hack))
     {
       set_location(q->location);
       output("%s", qualifier_name(q->id));

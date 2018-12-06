@@ -895,10 +895,10 @@ static expr_type analyze_expression(expression e) deletes
     case kind_conditional:
       {
 	conditional c = CAST(conditional, e);
-	expr_type cond, arg1, arg2;
+	expr_type /* cond,*/ arg1, arg2;
 	type c_type;
 	
-	cond = promote_to_ptr(analyze_expression(c->condition));
+	/* cond = */ promote_to_ptr(analyze_expression(c->condition));
 	arg1 = promote_to_ptr(analyze_expression(c->arg1));
 	arg2 = promote_to_ptr(analyze_expression(c->arg2));
 	

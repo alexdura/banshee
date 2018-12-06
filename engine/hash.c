@@ -545,11 +545,11 @@ void *hash_table_deserialize(FILE *f)
   ht->table = rarrayalloc(ht->r, ht->size, bucket);
   for (i = 0; i < ht->size; i++) {
     unsigned long num_buckets, j;
-    success &= fread(&num_buckets, sizeof(unsigned long), 1, f);
+    success = success && fread(&num_buckets, sizeof(unsigned long), 1, f);
     prev = &ht->table[i];
     for (j = 0; j < num_buckets; j++) {
       newbucket = ralloc(ht->r, struct bucket_);
-      success &= fread(&newbucket->key, sizeof(hash_key) + sizeof(hash_data), 1 ,f);
+      success = success && fread(&newbucket->key, sizeof(hash_key) + sizeof(hash_data), 1 ,f);
       newbucket->next = NULL;
       assert(!*prev);
       *prev = newbucket;

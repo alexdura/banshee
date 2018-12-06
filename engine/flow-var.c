@@ -240,11 +240,11 @@ void *flow_var_deserialize(FILE *f)
   var = ralloc(flow_var_region, struct flow_var_);
 
   success = fread((void *)&var->st, sizeof(stamp), 1, f);
-  success &= fread((void *)&var->alias, sizeof(gen_e), 1, f);
-  success &= fread((void *)&var->ubs, sizeof(bounds), 1, f);
-  success &= fread((void *)&var->lbs, sizeof(bounds), 1, f);
-  success &= fread((void *)&var->elt, sizeof(contour_elt), 1, f);
-  success &= fread((void *)&var->extra_info, sizeof(void *), 1, f);
+  success = success && fread((void *)&var->alias, sizeof(gen_e), 1, f);
+  success = success && fread((void *)&var->ubs, sizeof(bounds), 1, f);
+  success = success && fread((void *)&var->lbs, sizeof(bounds), 1, f);
+  success = success && fread((void *)&var->elt, sizeof(contour_elt), 1, f);
+  success = success && fread((void *)&var->extra_info, sizeof(void *), 1, f);
   assert(success);
   
   var->name = (char *)string_data_deserialize(f);
@@ -290,13 +290,13 @@ bool contour_serialize(FILE *f, void *obj)
 void *contour_deserialize(FILE *f)
 {
   contour c = ralloc(contour_region, struct contour);
-  int success;
+  int success = 1;
   assert(f);
 
-  success = fread((void *)&c->shape, sizeof(gen_e), 1, f);
-  success &= fread((void *)&c->fresh, sizeof(fresh_fn_ptr), 1, f);
-  success &= fread((void *)&c->get_stamp, sizeof(get_stamp_fn_ptr), 1, f);
-  success &= fread((void *)&c->instantiate, sizeof(contour_inst_fn_ptr), 1, f);
+  success = success && fread((void *)&c->shape, sizeof(gen_e), 1, f);
+  success = success && fread((void *)&c->fresh, sizeof(fresh_fn_ptr), 1, f);
+  success = success && fread((void *)&c->get_stamp, sizeof(get_stamp_fn_ptr), 1, f);
+  success = success && fread((void *)&c->instantiate, sizeof(contour_inst_fn_ptr), 1, f);
   assert(success);
 
   return c;

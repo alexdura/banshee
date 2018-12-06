@@ -614,16 +614,16 @@ void *list_deserialize(FILE *f)
   success = fread(&st, sizeof(st), 1, f);
   
   /* Read in the length */
-  success &= fread(&length, sizeof(length), 1, f);
+  success = success && fread(&length, sizeof(length), 1, f);
   
   /* Read in the persist kind */
-  success &= fread(&persist_kind, sizeof(persist_kind), 1, f);
+  success = success && fread(&persist_kind, sizeof(persist_kind), 1, f);
   
   result = new_list(permanent, persist_kind);
   
   for (i = 0; i < length; i++) {
     void *data = NULL;
-    success &= fread((void *)&data, sizeof(void *), 1, f);
+    success = success && fread((void *)&data, sizeof(void *), 1, f);
     list_append_tail(data, result);
   }
   

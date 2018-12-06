@@ -172,10 +172,10 @@ void *term_var_deserialize(FILE *f)
   
   var = ralloc(term_var_region, struct term_var_);
 
-  success &= fread((void *)&var->st, sizeof(stamp), 1, f);
-  success &= fread((void *)&var->pending, sizeof(bounds), 1, f);
+  success = success && fread((void *)&var->st, sizeof(stamp), 1, f);
+  success = success && fread((void *)&var->pending, sizeof(bounds), 1, f);
   var->name = (char *)string_data_deserialize(f);
-  success &= fread((void *)&var->elt, sizeof(tv_elt), 1, f);
+  success = success && fread((void *)&var->elt, sizeof(tv_elt), 1, f);
   assert(success);
   
   return var;

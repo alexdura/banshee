@@ -145,7 +145,7 @@ void *bounds_deserialize(FILE *f)
   int success = 1;
 
   assert(f);
-  success &= fread(b, sizeof(struct bounds_), 1, f);
+  success = success && fread(b, sizeof(struct bounds_), 1, f);
   assert(success);
 
   return b;
@@ -186,7 +186,7 @@ void *added_edge_info_deserialize(FILE *f)
   int success = 1;
 
   assert(f);
-  success &= fread(info, sizeof(struct added_edge_info_), 1, f);
+  success = success && fread(info, sizeof(struct added_edge_info_), 1, f);
   assert(success);
 
   return info;

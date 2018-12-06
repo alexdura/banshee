@@ -125,7 +125,7 @@ Updater *read_extra_info(const char *filename)
 		       Updater);
 
   for (i = NUM_REGIONS; i < NUM_REGIONS + num_extra_regions; i++) {
-    success &= fread((void *)&next_id, sizeof(int), 1, f);
+    success = success && fread((void *)&next_id, sizeof(int), 1, f);
     if (next_id == UNKNOWN_ID) {
       assert(extra_update_fn);
       result[i] = extra_update_fn;

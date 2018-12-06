@@ -1352,7 +1352,7 @@ void *flowrow_field_deserialize(FILE *f)
   result = ralloc(flowrow_field_region, struct flowrow_field_);
 
   result->label = (char *)string_data_deserialize(f);
-  success &= fread(&result->expr, sizeof(gen_e), 1 ,f);
+  success = success && fread(&result->expr, sizeof(gen_e), 1 ,f);
   assert(success);
   
   return result;
@@ -1392,9 +1392,9 @@ banshee_rollback_info flowrow_rollback_deserialize(FILE *f)
   
   assert(f);
 
-/*   success &= fread((void *)&info->added_edges, sizeof(hash_table), 1, f); */
-/*   success &= fread((void *)&info->set_aliases, sizeof(flow_var_list), 1, f); */
-  success &= fread(&info->added_edges, sizeof(hash_table) + sizeof(flow_var_list), 1, f);
+/*   success = success && fread((void *)&info->added_edges, sizeof(hash_table), 1, f); */
+/*   success = success && fread((void *)&info->set_aliases, sizeof(flow_var_list), 1, f); */
+  success = success && fread(&info->added_edges, sizeof(hash_table) + sizeof(flow_var_list), 1, f);
   assert(success);
 
   return (banshee_rollback_info)info;
@@ -1420,12 +1420,12 @@ void *flowrow_expr_deserialize(FILE *f)
 #endif	/* NONSPEC */
 
   assert(f);
-  success &= fread((void *)&type, sizeof(int), 1, f);
+  success = success && fread((void *)&type, sizeof(int), 1, f);
 
 #ifdef NONSPEC
   if (type == ZERO_TYPE || type == ONE_TYPE || type == ABS_TYPE ||
       type == WILD_TYPE) {
-    success &= fread(&base_type, sizeof(int), 1, f);
+    success = success && fread(&base_type, sizeof(int), 1, f);
   }  
 #endif
   assert(success);
@@ -1463,11 +1463,11 @@ void *flowrow_expr_deserialize(FILE *f)
 	flowrow frow = ralloc(flowrow_region, struct flowrow);
 	success = fread(&frow->st, sizeof(stamp), 1, f);
 #ifdef NONSPEC      
-	success &= fread(&frow->base_sort, sizeof(int), 1, f);
+	success = success && fread(&frow->base_sort, sizeof(int), 1, f);
 #endif
-/* 	success &= fread((void *)&frow->fields, sizeof(flowrow_map), 1, f); */
-/* 	success &= fread((void *)&frow->rest, sizeof(gen_e), 1, f); */
-	success &= fread(&frow->fields, sizeof(flowrow_map) + sizeof(gen_e), 1, f);
+/* 	success = success && fread((void *)&frow->fields, sizeof(flowrow_map), 1, f); */
+/* 	success = success && fread((void *)&frow->rest, sizeof(gen_e), 1, f); */
+	success = success && fread(&frow->fields, sizeof(flowrow_map) + sizeof(gen_e), 1, f);
   assert(success);
 	frow->type = type;
 	return frow;
@@ -1559,8 +1559,8 @@ void flowrow_serialize(FILE *f)
 void flowrow_deserialize(FILE *f)
 {
   int success = 1;
-  success &= fread(&flowrow_hash, sizeof(term_hash), 1, f);
-  success &= fread(&flowrow_current_rollback_info, sizeof(flowrow_rollback_info), 1, f);
+  success = success && fread(&flowrow_hash, sizeof(term_hash), 1, f);
+  success = success && fread(&flowrow_current_rollback_info, sizeof(flowrow_rollback_info), 1, f);
   assert(success);
 }
 
@@ -1582,8 +1582,8 @@ void write_module_flowrow(FILE *f)
 void update_module_flowrow(translation t, FILE *f)
 {
   int success = 1;
-  success &= fread(&flowrow_hash, sizeof(term_hash), 1, f);
-  success &= fread(&flowrow_current_rollback_info, sizeof(flowrow_rollback_info), 1, f);
+  success = success && fread(&flowrow_hash, sizeof(term_hash), 1, f);
+  success = success && fread(&flowrow_current_rollback_info, sizeof(flowrow_rollback_info), 1, f);
   assert(success);
   update_pointer(t, (void **)&flowrow_hash);
   update_pointer(t, (void **)&flowrow_current_rollback_info);
