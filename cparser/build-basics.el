@@ -136,4 +136,3 @@
   (insert "/* Automatically generated file, do not edit. See nodetypes.def */\n\n")
   (insert "/* Copyright (c) 2000-200 The Regents of the University of California. */\n")
   (insert "/* See the copyright notice in nodetypes.def for distribution restrictions */\n"))
-

@@ -16,15 +16,15 @@
 # the Free Software Foundation, 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-.INTERMEDIATE: \
-               AST_defs.c\
-               AST_defs.h\
-               AST_parent.c\
-               AST_print.c\
-               AST_types.h\
-               c-gperf.h\
-               c-parse.tab.c\
-               c-parse.tab.h
+# .INTERMEDIATE: \
+#                AST_defs.c\
+#                AST_defs.h\
+#                AST_parent.c\
+#                AST_print.c\
+#                AST_types.h\
+#                c-gperf.h\
+#                c-parse.tab.c\
+#                c-parse.tab.h
 
 
 OBJS = $(O)AST.o $(O)AST_utils.o $(O)array.o $(O)bitset.o $(O)builtins.o $(O)c-parse.tab.o $(O)c-lex.o \
@@ -47,12 +47,16 @@ c-parse.tab.c c-parse.tab.h: c-parse.y
 	bison -d c-parse.y
 
 AST_defs.c AST_defs.h AST_types.h: nodetypes.def build-types.el build-basics.el
+	@echo "===== 1"
 	emacs -batch -load build-types.el
+	@echo "+++++ 1"
 
 AST_parent.c: nodetypes.def build-parent.el build-basics.el
+	@echo "===== 2"
 	emacs -batch -load build-parent.el
 
 AST_print.c: nodetypes.def build-print.el build-basics.el
+	@echo "===== 3"
 	emacs -batch -load build-print.el
 
 c-gperf.h: c-parse.gperf qualifiers.h
@@ -104,4 +108,3 @@ $(O)mincut.o: optrc.c $(HDRS)
 
 tags:
 	etags *.[ch]
-
